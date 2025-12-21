@@ -13,5 +13,13 @@ public class Category
 
     public bool ActiveStatus {get; set;} = true;
 
+    public Category(string categoryName, string categoryDescription, Guid categoryId, bool activeStatus = true)
+    {
+        CategoryId = CategoryId.Create(categoryId);
+        CategoryName = categoryName;
+        CategoryDescription = categoryDescription;
+        ActiveStatus = activeStatus;
+    }
+
     
 }

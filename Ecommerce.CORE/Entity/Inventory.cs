@@ -18,4 +18,12 @@ public class Inventory
 
    // public InventoryType  InventoryType { get; set; } = InventoryType.Stock;
 
+   public Inventory(ProductId productId, Guid inventoryId, int stockQuantity = 0, int reservedQuantity = 0)
+   {
+      ProductId = productId;
+      InventoryId = InventoryId.Create(inventoryId);
+      StockQuantity = stockQuantity;
+      ReservedQuantity = reservedQuantity;   
+   }
+
 }

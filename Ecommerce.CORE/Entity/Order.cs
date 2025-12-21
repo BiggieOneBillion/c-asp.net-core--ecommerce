@@ -11,5 +11,10 @@ public class Order
 
    public PaymentId PaymentId { get; set; }
 
-   
+   public Order(Guid orderId, UserId userId, PaymentId paymentId)
+   {
+      OrderId = OrderId.Create(orderId);
+      UserId = userId;
+      PaymentId = paymentId;
+   }
 }

@@ -16,5 +16,12 @@ public class Payment
 
     public required OrderId OrderId { get; set; }
 
-    
+    public Payment(PaymentType paymentType, decimal amount, OrderId orderId)
+    {
+        PaymentId = PaymentId.Create(Guid.NewGuid());
+        PaymentType = paymentType;
+        Amount = amount;
+        OrderId = orderId;
+        PaymentDate = DateTime.UtcNow;
+    }
 }

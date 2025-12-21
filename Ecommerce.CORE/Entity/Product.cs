@@ -14,12 +14,12 @@ public class Product
 
    public ProductId ProductId { get; set; } = new ProductId();
 
-   public Product(string name, string description, Guid productId, Guid categoryId, decimal price )
+   public Product(string name, string description, Guid productId, CategoryId categoryId, decimal price )
    {
       Name = name;
       Description = description;
       ProductId = ProductId.Create(productId);
-      CategoryId = CategoryId.Create(categoryId);
+      CategoryId = categoryId;
       CurrentPrice = price;
    }
 }

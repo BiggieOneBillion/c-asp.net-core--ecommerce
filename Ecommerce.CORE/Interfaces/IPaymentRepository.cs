@@ -1,8 +1,9 @@
 using System;
+using Ecommerce.CORE.Entity;
 
 namespace Ecommerce.CORE.Interfaces;
 
-public interface IPaymentRepository
+public interface IPaymentRepository: IRepository<Payment>
 {
 
 }

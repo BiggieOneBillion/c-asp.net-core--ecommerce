@@ -12,10 +12,10 @@ public class Inventory
 
    public int StockQuantity { get; set; } = 0;
 
-    public int ReservedQuantity { get; set; } = 0;
+   public int ReservedQuantity { get; set; } = 0;
 
    public int AvaliableQuantity () => StockQuantity - ReservedQuantity;
 
-   public InventoryType  InventoryType { get; set; } = InventoryType.Stock;
+   // public InventoryType  InventoryType { get; set; } = InventoryType.Stock;
 
 }

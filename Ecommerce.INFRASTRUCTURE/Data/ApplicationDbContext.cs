@@ -20,6 +20,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<Order> Orders{ get; set; } = null!;
     public DbSet<OrderItems> OrderItems { get; set; } = null!;
     public DbSet<Payment> Payments { get; set; } = null!;
+    public DbSet<ProductPriceHistory> ProductPriceHistories {get; set;} = null!;
+    public DbSet<InventoryMovement> InventoryMovements { get; set; } = null!;
 
     // do not forget to enable audit trail
     // public DbSet<Invitation> Invitations { get; set; } = null!;

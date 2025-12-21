@@ -10,13 +10,16 @@ public class Product
 
    public required CategoryId CategoryId { get; set; }
 
+   public decimal CurrentPrice { get; set; }
+
    public ProductId ProductId { get; set; } = new ProductId();
 
-   public Product(string name, string description, Guid productId, Guid categoryId )
+   public Product(string name, string description, Guid productId, Guid categoryId, decimal price )
    {
       Name = name;
       Description = description;
       ProductId = ProductId.Create(productId);
       CategoryId = CategoryId.Create(categoryId);
+      CurrentPrice = price;
    }
 }

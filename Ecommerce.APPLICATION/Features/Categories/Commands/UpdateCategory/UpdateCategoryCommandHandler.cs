@@ -21,7 +21,7 @@ public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryComman
         try
         {
             var categoryId = CategoryId.Create(request.CategoryId);
-            var category = await _categoryRepository.GetByIdAsync(categoryId);
+            var category = await _categoryRepository.GetByIdAsync(categoryId.Id);
 
             if (category == null)
             {

@@ -1,6 +1,6 @@
 using AutoMapper;
 using Ecommerce.APPLICATION.Common.Models;
-using Ecommerce.APPLICATION.DTOs.Payment;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
 using MediatR;
@@ -8,7 +8,7 @@ using MediatR;
 namespace Ecommerce.APPLICATION.Features.Payments.Queries.GetPaymentsByOrder;
 
 public class GetPaymentsByOrderQueryHandler 
-    : IRequestHandler<GetPaymentsByOrderQuery, Result<PagedResult<CreatePaymentDTO>>>
+    : IRequestHandler<GetPaymentsByOrderQuery, Result<PagedResult<PaymentResponseDTO>>>
 {
     private readonly IPaymentRepository _paymentRepository;
     private readonly IMapper _mapper;
@@ -21,14 +21,14 @@ public class GetPaymentsByOrderQueryHandler
         _mapper = mapper;
     }
 
-    public async Task<Result<PagedResult<CreatePaymentDTO>>> Handle(
+    public async Task<Result<PagedResult<PaymentResponseDTO>>> Handle(
         GetPaymentsByOrderQuery request,
         CancellationToken cancellationToken)
     {
         try
         {
             var orderId = OrderId.Create(request.OrderId);
-            var payments = await _paymentRepository.GetByOrderIdAsync(orderId);
+            var payments = (await _paymentRepository.GetByOrderIdAsync(orderId.Id)).ToList();
 
             // Calculate pagination
             var totalCount = payments.Count;
@@ -37,9 +37,9 @@ public class GetPaymentsByOrderQueryHandler
                 .Take(request.PageSize)
                 .ToList();
 
-            var paymentDtos = _mapper.Map<List<CreatePaymentDTO>>(items);
+            var paymentDtos = _mapper.Map<List<PaymentResponseDTO>>(items);
 
-            var pagedResult = new PagedResult<CreatePaymentDTO>(
+            var pagedResult = new PagedResult<PaymentResponseDTO>(
                 paymentDtos,
                 request.PageNumber,
                 request.PageSize,
@@ -49,7 +49,7 @@ public class GetPaymentsByOrderQueryHandler
         }
         catch (Exception ex)
         {
-            return Result.Failure<PagedResult<CreatePaymentDTO>>(
+            return Result.Failure<PagedResult<PaymentResponseDTO>>(
                 new Error("Payment.QueryFailed", $"Failed to retrieve payments: {ex.Message}"));
         }
     }

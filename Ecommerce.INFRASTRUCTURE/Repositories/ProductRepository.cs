@@ -16,6 +16,16 @@ public class ProductRepository : IProductRepository
         throw new NotImplementedException();
     }
 
+    public Task<IEnumerable<Product>> GetAllAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IEnumerable<Product>> GetByCategoryAsync(Guid categoryId)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<Product?> GetByIdAsync(Guid id)
     {
         throw new NotImplementedException();

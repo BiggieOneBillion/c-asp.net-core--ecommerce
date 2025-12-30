@@ -21,7 +21,7 @@ public class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryComman
         try
         {
             var categoryId = CategoryId.Create(request.CategoryId);
-            var category = await _categoryRepository.GetByIdAsync(categoryId);
+            var category = await _categoryRepository.GetByIdAsync(categoryId.Id);
 
             if (category == null)
             {
@@ -29,7 +29,7 @@ public class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryComman
                     new Error("Category.NotFound", $"Category with ID {request.CategoryId} not found"));
             }
 
-            await _categoryRepository.DeleteAsync(categoryId);
+            await _categoryRepository.DeleteAsync(category);
 
             return Result.Success();
         }

@@ -24,6 +24,11 @@ namespace Ecommerce.INFRASTRUCTURE.Repositories
             throw new NotImplementedException();
         }
 
+        public Task<IEnumerable<InventoryMovement>> GetByProductIdAsync(Guid productId)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task UpdateAsync(InventoryMovement entity)
         {
             throw new NotImplementedException();

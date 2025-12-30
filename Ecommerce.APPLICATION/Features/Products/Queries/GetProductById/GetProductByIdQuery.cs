@@ -1,6 +1,7 @@
-using Ecommerce.APPLICATION.Common.Interfaces;
-using Ecommerce.APPLICATION.DTOs.Product;
+using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
+using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Products.Queries.GetProductById;
 
-public record GetProductByIdQuery(Guid ProductId) : IQuery<CreateProductDTO>;
+public record GetProductByIdQuery(Guid ProductId) : IRequest<Result<ProductResponseDTO>>;

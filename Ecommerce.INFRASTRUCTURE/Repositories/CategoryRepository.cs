@@ -25,6 +25,11 @@ public class CategoryRepository : ICategoryRepository
         throw new NotImplementedException();
     }
 
+    public Task<List<Category>> GetAllAsync()
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<Category?> GetByIdAsync(Guid id)
     {
         throw new NotImplementedException();

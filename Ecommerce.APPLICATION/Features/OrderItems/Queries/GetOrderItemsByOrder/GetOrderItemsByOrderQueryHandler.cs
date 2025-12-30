@@ -1,6 +1,6 @@
 using AutoMapper;
 using Ecommerce.APPLICATION.Common.Models;
-using Ecommerce.APPLICATION.DTOs.OrderItems;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
 using MediatR;
@@ -8,7 +8,7 @@ using MediatR;
 namespace Ecommerce.APPLICATION.Features.OrderItems.Queries.GetOrderItemsByOrder;
 
 public class GetOrderItemsByOrderQueryHandler 
-    : IRequestHandler<GetOrderItemsByOrderQuery, Result<PagedResult<CreateOrderItemsDTO>>>
+    : IRequestHandler<GetOrderItemsByOrderQuery, Result<PagedResult<OrderItemResponseDTO>>>
 {
     private readonly IOrderItemsRepository _orderItemsRepository;
     private readonly IMapper _mapper;
@@ -21,14 +21,14 @@ public class GetOrderItemsByOrderQueryHandler
         _mapper = mapper;
     }
 
-    public async Task<Result<PagedResult<CreateOrderItemsDTO>>> Handle(
+    public async Task<Result<PagedResult<OrderItemResponseDTO>>> Handle(
         GetOrderItemsByOrderQuery request,
         CancellationToken cancellationToken)
     {
         try
         {
             var orderId = OrderId.Create(request.OrderId);
-            var orderItems = await _orderItemsRepository.GetByOrderIdAsync(orderId);
+            var orderItems = (await _orderItemsRepository.GetByOrderIdAsync(orderId.Id)).ToList();
 
             // Calculate pagination
             var totalCount = orderItems.Count;
@@ -37,9 +37,9 @@ public class GetOrderItemsByOrderQueryHandler
                 .Take(request.PageSize)
                 .ToList();
 
-            var orderItemDtos = _mapper.Map<List<CreateOrderItemsDTO>>(items);
+            var orderItemDtos = _mapper.Map<List<OrderItemResponseDTO>>(items);
 
-            var pagedResult = new PagedResult<CreateOrderItemsDTO>(
+            var pagedResult = new PagedResult<OrderItemResponseDTO>(
                 orderItemDtos,
                 request.PageNumber,
                 request.PageSize,
@@ -49,7 +49,7 @@ public class GetOrderItemsByOrderQueryHandler
         }
         catch (Exception ex)
         {
-            return Result.Failure<PagedResult<CreateOrderItemsDTO>>(
+            return Result.Failure<PagedResult<OrderItemResponseDTO>>(
                 new Error("OrderItem.QueryFailed", $"Failed to retrieve order items: {ex.Message}"));
         }
     }

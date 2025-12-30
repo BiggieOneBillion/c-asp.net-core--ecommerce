@@ -26,7 +26,7 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Resul
         try
         {
             var userId = UserId.Create(request.UserId);
-            var user = await _userRepository.GetByIdAsync(userId);
+            var user = await _userRepository.GetByIdAsync(userId.Id);
 
             if (user == null)
             {
@@ -37,7 +37,7 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Resul
             // Check if email is being changed and if new email already exists
             if (user.Email != request.Email)
             {
-                var existingUser = await _userRepository.GetByEmailAsync(request.Email);
+                var existingUser = await _userRepository.GetUserByEmailAsync(request.Email);
                 if (existingUser != null)
                 {
                     return Result.Failure(

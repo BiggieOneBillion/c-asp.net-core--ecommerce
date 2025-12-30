@@ -1,4 +1,5 @@
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
 using MediatR;
@@ -24,8 +25,8 @@ public class CreateInventoryCommandHandler : IRequestHandler<CreateInventoryComm
             var productId = ProductId.Create(request.ProductId);
 
             var inventory = new CORE.Entity.Inventory(
-                inventoryId,
-                productId,
+                productId: productId,
+                inventoryId:inventoryId,
                 request.StockQuantity,
                 request.ReservedQuantity);
 

@@ -21,6 +21,11 @@ public class InventoryRepository : IInventoryRepository
         throw new NotImplementedException();
     }
 
+    public Task<Inventory> GetByProductIdAsync(Guid productId)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task UpdateAsync(Inventory entity)
     {
         throw new NotImplementedException();

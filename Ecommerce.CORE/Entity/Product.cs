@@ -8,7 +8,7 @@ public class Product
    public string Name { get; set; } = string.Empty;
    public string Description { get; set; } = string.Empty;
 
-   public required CategoryId CategoryId { get; set; }
+   public  CategoryId CategoryId { get; set; }
 
    public decimal CurrentPrice { get; set; }
 

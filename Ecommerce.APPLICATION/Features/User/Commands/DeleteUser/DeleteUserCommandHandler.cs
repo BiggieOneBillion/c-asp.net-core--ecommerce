@@ -21,7 +21,7 @@ public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, Resul
         try
         {
             var userId = UserId.Create(request.UserId);
-            var user = await _userRepository.GetByIdAsync(userId);
+            var user = await _userRepository.GetByIdAsync(userId.Id);
 
             if (user == null)
             {
@@ -29,7 +29,7 @@ public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, Resul
                     new Error("User.NotFound", $"User with ID {request.UserId} not found"));
             }
 
-            await _userRepository.DeleteAsync(userId);
+            await _userRepository.DeleteAsync(user);
 
             return Result.Success();
         }

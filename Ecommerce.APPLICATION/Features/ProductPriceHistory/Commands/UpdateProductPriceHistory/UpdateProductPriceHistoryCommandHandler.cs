@@ -1,4 +1,5 @@
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
 using MediatR;
@@ -21,7 +22,7 @@ public class UpdateProductPriceHistoryCommandHandler : IRequestHandler<UpdatePro
         try
         {
             var priceHistoryId = ProductPriceHistoryId.Create(request.ProductPriceHistoryId);
-            var priceHistory = await _priceHistoryRepository.GetByIdAsync(priceHistoryId);
+            var priceHistory = await _priceHistoryRepository.GetByIdAsync(priceHistoryId.Id);
 
             if (priceHistory == null)
             {

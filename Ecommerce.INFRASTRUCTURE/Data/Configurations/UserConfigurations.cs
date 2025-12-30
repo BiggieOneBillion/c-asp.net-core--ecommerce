@@ -10,9 +10,9 @@ public class UserConfiguration : IEntityTypeConfiguration<Users>
     {
         builder.ToTable("Users");
         
-        builder.HasKey(u => u.UserId.Value());
+        builder.HasKey(u => u.Id.Value());
         
-        builder.Property(u => u.UserId.Value())
+        builder.Property(u => u.Id.Value())
             .HasMaxLength(50)
             .IsRequired();
         

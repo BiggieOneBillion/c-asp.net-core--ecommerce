@@ -21,6 +21,11 @@ public class OrderRepository : IOrderRepository
         throw new NotImplementedException();
     }
 
+    public Task<IEnumerable<Order>> GetByUserIdAsync(Guid userId)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task UpdateAsync(Order entity)
     {
         throw new NotImplementedException();

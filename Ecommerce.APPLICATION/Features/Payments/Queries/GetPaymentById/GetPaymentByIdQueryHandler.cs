@@ -1,13 +1,13 @@
 using AutoMapper;
 using Ecommerce.APPLICATION.Common.Models;
-using Ecommerce.APPLICATION.DTOs.Payment;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
 using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Payments.Queries.GetPaymentById;
 
-public class GetPaymentByIdQueryHandler : IRequestHandler<GetPaymentByIdQuery, Result<CreatePaymentDTO>>
+public class GetPaymentByIdQueryHandler : IRequestHandler<GetPaymentByIdQuery, Result<PaymentResponseDTO>>
 {
     private readonly IPaymentRepository _paymentRepository;
     private readonly IMapper _mapper;
@@ -20,28 +20,28 @@ public class GetPaymentByIdQueryHandler : IRequestHandler<GetPaymentByIdQuery, R
         _mapper = mapper;
     }
 
-    public async Task<Result<CreatePaymentDTO>> Handle(
+    public async Task<Result<PaymentResponseDTO>> Handle(
         GetPaymentByIdQuery request,
         CancellationToken cancellationToken)
     {
         try
         {
             var paymentId = PaymentId.Create(request.PaymentId);
-            var payment = await _paymentRepository.GetByIdAsync(paymentId);
+            var payment = await _paymentRepository.GetByIdAsync(paymentId.Id);
 
             if (payment == null)
             {
-                return Result.Failure<CreatePaymentDTO>(
+                return Result.Failure<PaymentResponseDTO>(
                     new Error("Payment.NotFound", $"Payment with ID {request.PaymentId} not found"));
             }
 
-            var paymentDto = _mapper.Map<CreatePaymentDTO>(payment);
+            var paymentDto = _mapper.Map<PaymentResponseDTO>(payment);
 
             return Result.Success(paymentDto);
         }
         catch (Exception ex)
         {
-            return Result.Failure<CreatePaymentDTO>(
+            return Result.Failure<PaymentResponseDTO>(
                 new Error("Payment.QueryFailed", $"Failed to retrieve payment: {ex.Message}"));
         }
     }

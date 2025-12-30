@@ -21,7 +21,7 @@ public class DeleteOrderItemCommandHandler : IRequestHandler<DeleteOrderItemComm
         try
         {
             var orderItemId = OrderItemsId.Create(request.OrderItemId);
-            var orderItem = await _orderItemsRepository.GetByIdAsync(orderItemId);
+            var orderItem = await _orderItemsRepository.GetByIdAsync(orderItemId.Id);
 
             if (orderItem == null)
             {

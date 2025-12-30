@@ -1,6 +1,6 @@
 using AutoMapper;
 using Ecommerce.APPLICATION.Common.Models;
-using Ecommerce.APPLICATION.DTOs.Order;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
 using MediatR;
@@ -8,7 +8,7 @@ using MediatR;
 namespace Ecommerce.APPLICATION.Features.Orders.Queries.GetOrdersByUser;
 
 public class GetOrdersByUserQueryHandler 
-    : IRequestHandler<GetOrdersByUserQuery, Result<PagedResult<CreateOrderDTO>>>
+    : IRequestHandler<GetOrdersByUserQuery, Result<PagedResult<OrderResponseDTO>>>
 {
     private readonly IOrderRepository _orderRepository;
     private readonly IMapper _mapper;
@@ -21,14 +21,14 @@ public class GetOrdersByUserQueryHandler
         _mapper = mapper;
     }
 
-    public async Task<Result<PagedResult<CreateOrderDTO>>> Handle(
+    public async Task<Result<PagedResult<OrderResponseDTO>>> Handle(
         GetOrdersByUserQuery request,
         CancellationToken cancellationToken)
     {
         try
         {
             var userId = UserId.Create(request.UserId);
-            var orders = await _orderRepository.GetByUserIdAsync(userId);
+            var orders = (await _orderRepository.GetByUserIdAsync(userId.Id)).ToList();
 
             // Calculate pagination
             var totalCount = orders.Count;
@@ -37,9 +37,9 @@ public class GetOrdersByUserQueryHandler
                 .Take(request.PageSize)
                 .ToList();
 
-            var orderDtos = _mapper.Map<List<CreateOrderDTO>>(items);
+            var orderDtos = _mapper.Map<List<OrderResponseDTO>>(items);
 
-            var pagedResult = new PagedResult<CreateOrderDTO>(
+            var pagedResult = new PagedResult<OrderResponseDTO>(
                 orderDtos,
                 request.PageNumber,
                 request.PageSize,
@@ -49,7 +49,7 @@ public class GetOrdersByUserQueryHandler
         }
         catch (Exception ex)
         {
-            return Result.Failure<PagedResult<CreateOrderDTO>>(
+            return Result.Failure<PagedResult<OrderResponseDTO>>(
                 new Error("Order.QueryFailed", $"Failed to retrieve orders: {ex.Message}"));
         }
     }

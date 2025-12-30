@@ -9,5 +9,6 @@ namespace Ecommerce.CORE.Interfaces
     public interface IProductPriceHistoryRepository: IRepository<ProductPriceHistory>
     {
         
+        Task<IEnumerable<ProductPriceHistory>> GetByProductIdAsync(Guid productId);
     }
 }

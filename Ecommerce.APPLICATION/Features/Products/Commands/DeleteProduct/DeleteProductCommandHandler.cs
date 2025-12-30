@@ -1,4 +1,5 @@
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
 using MediatR;
@@ -21,7 +22,7 @@ public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand,
         try
         {
             var productId = ProductId.Create(request.ProductId);
-            var product = await _productRepository.GetByIdAsync(productId);
+            var product = await _productRepository.GetByIdAsync(productId.Id);
 
             if (product == null)
             {
@@ -29,7 +30,7 @@ public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand,
                     new Error("Product.NotFound", $"Product with ID {request.ProductId} not found"));
             }
 
-            await _productRepository.DeleteAsync(productId);
+            await _productRepository.DeleteAsync(product);
 
             return Result.Success();
         }

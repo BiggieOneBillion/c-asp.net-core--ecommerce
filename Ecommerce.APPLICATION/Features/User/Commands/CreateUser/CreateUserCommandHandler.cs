@@ -4,12 +4,15 @@ using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using MediatR;
 
+
+
 namespace Ecommerce.APPLICATION.Features.Users.Commands.CreateUser;
 
 public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Result<Guid>>
 {
     private readonly IUserRepository _userRepository;
     private readonly IPasswordService _passwordService;
+ 
 
     public CreateUserCommandHandler(
         IUserRepository userRepository,
@@ -26,7 +29,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
         try
         {
             // Check if user with email already exists
-            var existingUser = await _userRepository.GetByEmailAsync(request.Email);
+            var existingUser = await _userRepository.GetUserByEmailAsync(request.Email);
             if (existingUser != null)
             {
                 return Result.Failure<Guid>(
@@ -36,11 +39,13 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
             var userId = Guid.NewGuid();
             var hashedPassword = _passwordService.HashPassword(request.Password);
 
-            var user = new Users(
-                request.Name,
-                request.Email,
-                hashedPassword,
-                userId);
+
+        CORE.Entity.Users user = new(
+                    name: request.Name,
+                    email: request.Email,
+                    password: hashedPassword,
+                    userId: userId
+                );
 
             await _userRepository.CreateAsync(user);
 

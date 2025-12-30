@@ -24,12 +24,10 @@ public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand,
             var paymentId = Guid.NewGuid();
             var orderId = OrderId.Create(request.OrderId);
 
-            var payment = new Payment(
-                paymentId,
-                request.PaymentType,
-                request.Amount,
-                request.PaymentDate,
-                orderId);
+            Payment payment = new(
+                paymentType:request.PaymentType,
+                amount:request.Amount,  
+                orderId:orderId);
 
             await _paymentRepository.CreateAsync(payment);
 

@@ -1,6 +1,6 @@
 using AutoMapper;
 using Ecommerce.APPLICATION.Common.Models;
-using Ecommerce.APPLICATION.DTOs.Product;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
 using MediatR;
@@ -8,7 +8,7 @@ using MediatR;
 namespace Ecommerce.APPLICATION.Features.Products.Queries.GetProductsByCategory;
 
 public class GetProductsByCategoryQueryHandler 
-    : IRequestHandler<GetProductsByCategoryQuery, Result<PagedResult<CreateProductDTO>>>
+    : IRequestHandler<GetProductsByCategoryQuery, Result<PagedResult<ProductResponseDTO>>>
 {
     private readonly IProductRepository _productRepository;
     private readonly IMapper _mapper;
@@ -21,14 +21,14 @@ public class GetProductsByCategoryQueryHandler
         _mapper = mapper;
     }
 
-    public async Task<Result<PagedResult<CreateProductDTO>>> Handle(
+    public async Task<Result<PagedResult<ProductResponseDTO>>> Handle(
         GetProductsByCategoryQuery request,
         CancellationToken cancellationToken)
     {
         try
         {
             var categoryId = CategoryId.Create(request.CategoryId);
-            var products = await _productRepository.GetByCategoryAsync(categoryId);
+            var products = (await _productRepository.GetByCategoryAsync(categoryId.Id)).ToList();
 
             // Calculate pagination
             var totalCount = products.Count;
@@ -37,9 +37,9 @@ public class GetProductsByCategoryQueryHandler
                 .Take(request.PageSize)
                 .ToList();
 
-            var productDtos = _mapper.Map<List<CreateProductDTO>>(items);
+            var productDtos = _mapper.Map<List<ProductResponseDTO>>(items);
 
-            var pagedResult = new PagedResult<CreateProductDTO>(
+            var pagedResult = new PagedResult<ProductResponseDTO>(
                 productDtos,
                 request.PageNumber,
                 request.PageSize,
@@ -49,8 +49,8 @@ public class GetProductsByCategoryQueryHandler
         }
         catch (Exception ex)
         {
-            return Result.Failure<PagedResult<CreateProductDTO>>(
-                new Error("Product.QueryFailed", $"Failed to retrieve products by category: {ex.Message}"));
+            return Result.Failure<PagedResult<ProductResponseDTO>>(
+                new Error("Product.QueryFailed", $"Failed to retrieve products: {ex.Message}"));
         }
     }
 }

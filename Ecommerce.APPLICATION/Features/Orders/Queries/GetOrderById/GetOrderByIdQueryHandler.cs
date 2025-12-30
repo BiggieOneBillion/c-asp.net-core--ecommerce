@@ -1,13 +1,13 @@
 using AutoMapper;
 using Ecommerce.APPLICATION.Common.Models;
-using Ecommerce.APPLICATION.DTOs.Order;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
 using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Orders.Queries.GetOrderById;
 
-public class GetOrderByIdQueryHandler : IRequestHandler<GetOrderByIdQuery, Result<CreateOrderDTO>>
+public class GetOrderByIdQueryHandler : IRequestHandler<GetOrderByIdQuery, Result<OrderResponseDTO>>
 {
     private readonly IOrderRepository _orderRepository;
     private readonly IMapper _mapper;
@@ -20,28 +20,28 @@ public class GetOrderByIdQueryHandler : IRequestHandler<GetOrderByIdQuery, Resul
         _mapper = mapper;
     }
 
-    public async Task<Result<CreateOrderDTO>> Handle(
+    public async Task<Result<OrderResponseDTO>> Handle(
         GetOrderByIdQuery request,
         CancellationToken cancellationToken)
     {
         try
         {
             var orderId = OrderId.Create(request.OrderId);
-            var order = await _orderRepository.GetByIdAsync(orderId);
+            var order = await _orderRepository.GetByIdAsync(orderId.Id);
 
             if (order == null)
             {
-                return Result.Failure<CreateOrderDTO>(
+                return Result.Failure<OrderResponseDTO>(
                     new Error("Order.NotFound", $"Order with ID {request.OrderId} not found"));
             }
 
-            var orderDto = _mapper.Map<CreateOrderDTO>(order);
+            var orderDto = _mapper.Map<OrderResponseDTO>(order);
 
             return Result.Success(orderDto);
         }
         catch (Exception ex)
         {
-            return Result.Failure<CreateOrderDTO>(
+            return Result.Failure<OrderResponseDTO>(
                 new Error("Order.QueryFailed", $"Failed to retrieve order: {ex.Message}"));
         }
     }

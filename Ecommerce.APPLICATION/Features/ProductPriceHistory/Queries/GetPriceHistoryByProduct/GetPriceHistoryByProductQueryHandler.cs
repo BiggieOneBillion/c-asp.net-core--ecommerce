@@ -1,6 +1,7 @@
 using AutoMapper;
 using Ecommerce.APPLICATION.Common.Models;
-using Ecommerce.APPLICATION.DTOs.ProductPriceHistory;
+using Ecommerce.APPLICATION.ResponseDTOs;
+using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
 using MediatR;
@@ -8,7 +9,7 @@ using MediatR;
 namespace Ecommerce.APPLICATION.Features.ProductPriceHistory.Queries.GetPriceHistoryByProduct;
 
 public class GetPriceHistoryByProductQueryHandler 
-    : IRequestHandler<GetPriceHistoryByProductQuery, Result<PagedResult<CreateProductPriceHistoryDTO>>>
+    : IRequestHandler<GetPriceHistoryByProductQuery, Result<PagedResult<ProductPriceHistoryResponseDTO>>>
 {
     private readonly IProductPriceHistoryRepository _priceHistoryRepository;
     private readonly IMapper _mapper;
@@ -21,14 +22,14 @@ public class GetPriceHistoryByProductQueryHandler
         _mapper = mapper;
     }
 
-    public async Task<Result<PagedResult<CreateProductPriceHistoryDTO>>> Handle(
+    public async Task<Result<PagedResult<ProductPriceHistoryResponseDTO>>> Handle(
         GetPriceHistoryByProductQuery request,
         CancellationToken cancellationToken)
     {
         try
         {
             var productId = ProductId.Create(request.ProductId);
-            var priceHistories = await _priceHistoryRepository.GetByProductIdAsync(productId);
+            var priceHistories = (await _priceHistoryRepository.GetByProductIdAsync(productId.Id)).ToList();
 
             // Calculate pagination
             var totalCount = priceHistories.Count;
@@ -38,10 +39,10 @@ public class GetPriceHistoryByProductQueryHandler
                 .Take(request.PageSize)
                 .ToList();
 
-            var priceHistoryDtos = _mapper.Map<List<CreateProductPriceHistoryDTO>>(items);
+            var historyDtos = _mapper.Map<List<ProductPriceHistoryResponseDTO>>(items);
 
-            var pagedResult = new PagedResult<CreateProductPriceHistoryDTO>(
-                priceHistoryDtos,
+            var pagedResult = new PagedResult<ProductPriceHistoryResponseDTO>(
+                historyDtos,
                 request.PageNumber,
                 request.PageSize,
                 totalCount);
@@ -50,7 +51,7 @@ public class GetPriceHistoryByProductQueryHandler
         }
         catch (Exception ex)
         {
-            return Result.Failure<PagedResult<CreateProductPriceHistoryDTO>>(
+            return Result.Failure<PagedResult<ProductPriceHistoryResponseDTO>>(
                 new Error("ProductPriceHistory.QueryFailed", $"Failed to retrieve price history: {ex.Message}"));
         }
     }

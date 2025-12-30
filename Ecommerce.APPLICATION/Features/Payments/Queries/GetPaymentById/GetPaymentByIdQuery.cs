@@ -1,6 +1,7 @@
-using Ecommerce.APPLICATION.Common.Interfaces;
-using Ecommerce.APPLICATION.DTOs.Payment;
+using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
+using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Payments.Queries.GetPaymentById;
 
-public record GetPaymentByIdQuery(Guid PaymentId) : IQuery<CreatePaymentDTO>;
+public record GetPaymentByIdQuery(Guid PaymentId) : IRequest<Result<PaymentResponseDTO>>;

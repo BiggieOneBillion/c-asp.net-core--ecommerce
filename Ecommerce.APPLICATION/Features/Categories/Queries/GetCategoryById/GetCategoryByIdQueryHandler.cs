@@ -1,13 +1,13 @@
 using AutoMapper;
 using Ecommerce.APPLICATION.Common.Models;
-using Ecommerce.APPLICATION.DTOs.Category;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
 using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Categories.Queries.GetCategoryById;
 
-public class GetCategoryByIdQueryHandler : IRequestHandler<GetCategoryByIdQuery, Result<CreateCategoryDTO>>
+public class GetCategoryByIdQueryHandler : IRequestHandler<GetCategoryByIdQuery, Result<CategoryResponseDTO>>
 {
     private readonly ICategoryRepository _categoryRepository;
     private readonly IMapper _mapper;
@@ -20,28 +20,28 @@ public class GetCategoryByIdQueryHandler : IRequestHandler<GetCategoryByIdQuery,
         _mapper = mapper;
     }
 
-    public async Task<Result<CreateCategoryDTO>> Handle(
+    public async Task<Result<CategoryResponseDTO>> Handle(
         GetCategoryByIdQuery request,
         CancellationToken cancellationToken)
     {
         try
         {
             var categoryId = CategoryId.Create(request.CategoryId);
-            var category = await _categoryRepository.GetByIdAsync(categoryId);
+            var category = await _categoryRepository.GetByIdAsync(categoryId.Id);
 
             if (category == null)
             {
-                return Result.Failure<CreateCategoryDTO>(
+                return Result.Failure<CategoryResponseDTO>(
                     new Error("Category.NotFound", $"Category with ID {request.CategoryId} not found"));
             }
 
-            var categoryDto = _mapper.Map<CreateCategoryDTO>(category);
+            var categoryDto = _mapper.Map<CategoryResponseDTO>(category);
 
             return Result.Success(categoryDto);
         }
         catch (Exception ex)
         {
-            return Result.Failure<CreateCategoryDTO>(
+            return Result.Failure<CategoryResponseDTO>(
                 new Error("Category.QueryFailed", $"Failed to retrieve category: {ex.Message}"));
         }
     }

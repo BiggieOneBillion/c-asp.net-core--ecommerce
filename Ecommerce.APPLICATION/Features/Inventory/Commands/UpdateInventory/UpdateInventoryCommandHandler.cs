@@ -1,4 +1,5 @@
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
 using MediatR;
@@ -21,7 +22,7 @@ public class UpdateInventoryCommandHandler : IRequestHandler<UpdateInventoryComm
         try
         {
             var inventoryId = InventoryId.Create(request.InventoryId);
-            var inventory = await _inventoryRepository.GetByIdAsync(inventoryId);
+            var inventory = await _inventoryRepository.GetByIdAsync(inventoryId.Id);
 
             if (inventory == null)
             {

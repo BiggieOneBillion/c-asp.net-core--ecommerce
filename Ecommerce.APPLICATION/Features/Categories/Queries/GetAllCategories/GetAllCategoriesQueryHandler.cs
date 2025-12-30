@@ -1,13 +1,13 @@
 using AutoMapper;
 using Ecommerce.APPLICATION.Common.Models;
-using Ecommerce.APPLICATION.DTOs.Category;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Interfaces;
 using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Categories.Queries.GetAllCategories;
 
 public class GetAllCategoriesQueryHandler 
-    : IRequestHandler<GetAllCategoriesQuery, Result<PagedResult<CreateCategoryDTO>>>
+    : IRequestHandler<GetAllCategoriesQuery, Result<PagedResult<CategoryResponseDTO>>>
 {
     private readonly ICategoryRepository _categoryRepository;
     private readonly IMapper _mapper;
@@ -20,7 +20,7 @@ public class GetAllCategoriesQueryHandler
         _mapper = mapper;
     }
 
-    public async Task<Result<PagedResult<CreateCategoryDTO>>> Handle(
+    public async Task<Result<PagedResult<CategoryResponseDTO>>> Handle(
         GetAllCategoriesQuery request,
         CancellationToken cancellationToken)
     {
@@ -41,9 +41,9 @@ public class GetAllCategoriesQueryHandler
                 .Take(request.PageSize)
                 .ToList();
 
-            var categoryDtos = _mapper.Map<List<CreateCategoryDTO>>(items);
+            var categoryDtos = _mapper.Map<List<CategoryResponseDTO>>(items);
 
-            var pagedResult = new PagedResult<CreateCategoryDTO>(
+            var pagedResult = new PagedResult<CategoryResponseDTO>(
                 categoryDtos,
                 request.PageNumber,
                 request.PageSize,
@@ -53,7 +53,7 @@ public class GetAllCategoriesQueryHandler
         }
         catch (Exception ex)
         {
-            return Result.Failure<PagedResult<CreateCategoryDTO>>(
+            return Result.Failure<PagedResult<CategoryResponseDTO>>(
                 new Error("Category.QueryFailed", $"Failed to retrieve categories: {ex.Message}"));
         }
     }

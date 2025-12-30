@@ -1,4 +1,5 @@
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
 using MediatR;
@@ -24,12 +25,11 @@ public class CreateProductPriceHistoryCommandHandler : IRequestHandler<CreatePro
             var productId = ProductId.Create(request.ProductId);
 
             var priceHistory = new CORE.Entity.ProductPriceHistory(
-                priceHistoryId,
-                productId,
-                request.NewPrice,
-                request.OldPrice,
-                request.EffectiveDate,
-                request.ChangedAt);
+                productId:productId,
+                newPrice:request.NewPrice,
+                oldPrice:request.OldPrice,
+                effectiveDate:request.EffectiveDate
+                );
 
             await _priceHistoryRepository.CreateAsync(priceHistory);
 

@@ -6,6 +6,6 @@ namespace Ecommerce.APPLICATION.Features.InventoryMovement.Commands.CreateInvent
 public record CreateInventoryMovementCommand(
     Guid ProductId,
     int QuantityChanged,
-    MovementType MovementType,
+    InventoryMovementType MovementType,
     string? Reason = null
 ) : ICommand<Guid>;

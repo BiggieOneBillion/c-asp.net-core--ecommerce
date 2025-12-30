@@ -21,6 +21,11 @@ public class PaymentRepository : IPaymentRepository
         throw new NotImplementedException();
     }
 
+    public Task<IEnumerable<Payment>> GetByOrderIdAsync(Guid orderId)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task UpdateAsync(Payment entity)
     {
         throw new NotImplementedException();

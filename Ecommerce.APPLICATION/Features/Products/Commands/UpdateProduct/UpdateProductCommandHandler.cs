@@ -1,4 +1,5 @@
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
 using MediatR;
@@ -21,7 +22,7 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
         try
         {
             var productId = ProductId.Create(request.ProductId);
-            var product = await _productRepository.GetByIdAsync(productId);
+            var product = await _productRepository.GetByIdAsync(productId.Id);
 
             if (product == null)
             {

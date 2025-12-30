@@ -1,4 +1,5 @@
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
 using MediatR;
@@ -24,11 +25,10 @@ public class CreateInventoryMovementCommandHandler : IRequestHandler<CreateInven
             var productId = ProductId.Create(request.ProductId);
 
             var inventoryMovement = new CORE.Entity.InventoryMovement(
-                movementId,
-                productId,
-                request.QuantityChanged,
-                request.MovementType,
-                request.Reason);
+                productId:productId,
+                quantityChanged:request.QuantityChanged,
+                movementType:request.MovementType,
+                reason:request.Reason);
 
             await _inventoryMovementRepository.CreateAsync(inventoryMovement);
 

@@ -9,10 +9,12 @@ namespace Ecommerce.APPLICATION.Features.OrderItems.Commands.CreateOrderItem;
 public class CreateOrderItemCommandHandler : IRequestHandler<CreateOrderItemCommand, Result<Guid>>
 {
     private readonly IOrderItemsRepository _orderItemsRepository;
+    private readonly IProductRepository _productRepository;
 
-    public CreateOrderItemCommandHandler(IOrderItemsRepository orderItemsRepository)
+    public CreateOrderItemCommandHandler(IOrderItemsRepository orderItemsRepository, IProductRepository productRepository)
     {
         _orderItemsRepository = orderItemsRepository;
+        _productRepository = productRepository;
     }
 
     public async Task<Result<Guid>> Handle(
@@ -25,12 +27,22 @@ public class CreateOrderItemCommandHandler : IRequestHandler<CreateOrderItemComm
             var orderId = OrderId.Create(request.OrderId);
             var productId = ProductId.Create(request.ProductId);
 
-            var orderItem = new OrderItems(
-                orderItemId,
-                orderId,
-                productId,
-                request.Quantity,
-                request.CreateAt);
+            // check for product and get the price at purchase time if needed
+            var product = await _productRepository.GetByIdAsync(productId.Id);
+
+            if(product == null)
+            {
+                return Result.Failure<Guid>(
+                    new Error("Product.NotFound", $"Product with ID {request.ProductId} not found"));
+            }
+
+
+            CORE.Entity.OrderItems orderItem = new CORE.Entity.OrderItems(
+                orderId:orderId,
+                productId:productId,
+                quantity:request.Quantity,
+                pricePerUnitAtPurchaseTime: product!.CurrentPrice
+                );
 
             await _orderItemsRepository.CreateAsync(orderItem);
 

@@ -24,6 +24,11 @@ namespace Ecommerce.INFRASTRUCTURE.Repositories
             throw new NotImplementedException();
         }
 
+        public Task<IEnumerable<ProductPriceHistory>> GetByProductIdAsync(Guid productId)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task UpdateAsync(ProductPriceHistory entity)
         {
             throw new NotImplementedException();

@@ -5,9 +5,9 @@ namespace Ecommerce.CORE.Entity
 {
     public class InventoryMovement
     {
-        public required InventoryMovementId InventoryMovementId { get; set; }
+        public  InventoryMovementId InventoryMovementId { get; set; }
 
-        public required ProductId ProductId { get; set; }
+        public  ProductId ProductId { get; set; }
 
         public int QuantityChanged { get; set; }
 

@@ -5,9 +5,9 @@ namespace Ecommerce.CORE.Entity
 {
     public class ProductPriceHistory
     {
-        public required ProductPriceHistoryId ProductPriceHistoryId { get; set; }
+        public  ProductPriceHistoryId ProductPriceHistoryId { get; set; }
 
-        public required ProductId ProductId { get; set; }
+        public  ProductId ProductId { get; set; }
 
         public decimal NewPrice { get; set; }
 

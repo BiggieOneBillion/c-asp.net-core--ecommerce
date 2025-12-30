@@ -1,13 +1,13 @@
 using AutoMapper;
 using Ecommerce.APPLICATION.Common.Models;
-using Ecommerce.APPLICATION.DTOs.Users;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
 using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Users.Queries.GetUserById;
 
-public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, Result<CreateUserDTO>>
+public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, Result<UserResponseDTO>>
 {
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
@@ -20,28 +20,29 @@ public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, Result<
         _mapper = mapper;
     }
 
-    public async Task<Result<CreateUserDTO>> Handle(
+    public async Task<Result<UserResponseDTO>> Handle(
         GetUserByIdQuery request,
         CancellationToken cancellationToken)
     {
         try
         {
             var userId = UserId.Create(request.UserId);
-            var user = await _userRepository.GetByIdAsync(userId);
+            
+            var user = await _userRepository.GetByIdAsync(userId.Id);
 
             if (user == null)
             {
-                return Result.Failure<CreateUserDTO>(
+                return Result.Failure<UserResponseDTO>(
                     new Error("User.NotFound", $"User with ID {request.UserId} not found"));
             }
 
-            var userDto = _mapper.Map<CreateUserDTO>(user);
+            var userDto = _mapper.Map<UserResponseDTO>(user);
 
             return Result.Success(userDto);
         }
         catch (Exception ex)
         {
-            return Result.Failure<CreateUserDTO>(
+            return Result.Failure<UserResponseDTO>(
                 new Error("User.QueryFailed", $"Failed to retrieve user: {ex.Message}"));
         }
     }

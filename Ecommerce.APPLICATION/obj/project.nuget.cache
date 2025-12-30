@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "dgSpecHash": "pb/gJffAOW4=",
-  "success": false,
+  "dgSpecHash": "opUYookLNEM=",
+  "success": true,
   "projectFilePath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.APPLICATION/Ecommerce.APPLICATION.csproj",
   "expectedPackageFiles": [
     "/Users/chukwuchinwendu/.nuget/packages/automapper/16.0.0/automapper.16.0.0.nupkg.sha512",
@@ -19,9 +19,9 @@
     "/Users/chukwuchinwendu/.nuget/packages/microsoft.bcl.asyncinterfaces/1.1.1/microsoft.bcl.asyncinterfaces.1.1.1.nupkg.sha512",
     "/Users/chukwuchinwendu/.nuget/packages/microsoft.data.sqlclient/5.1.6/microsoft.data.sqlclient.5.1.6.nupkg.sha512",
     "/Users/chukwuchinwendu/.nuget/packages/microsoft.data.sqlclient.sni.runtime/5.1.1/microsoft.data.sqlclient.sni.runtime.5.1.1.nupkg.sha512",
-    "/Users/chukwuchinwendu/.nuget/packages/microsoft.entityframeworkcore/9.0.0/microsoft.entityframeworkcore.9.0.0.nupkg.sha512",
-    "/Users/chukwuchinwendu/.nuget/packages/microsoft.entityframeworkcore.abstractions/9.0.0/microsoft.entityframeworkcore.abstractions.9.0.0.nupkg.sha512",
-    "/Users/chukwuchinwendu/.nuget/packages/microsoft.entityframeworkcore.analyzers/9.0.0/microsoft.entityframeworkcore.analyzers.9.0.0.nupkg.sha512",
+    "/Users/chukwuchinwendu/.nuget/packages/microsoft.entityframeworkcore/9.0.1/microsoft.entityframeworkcore.9.0.1.nupkg.sha512",
+    "/Users/chukwuchinwendu/.nuget/packages/microsoft.entityframeworkcore.abstractions/9.0.1/microsoft.entityframeworkcore.abstractions.9.0.1.nupkg.sha512",
+    "/Users/chukwuchinwendu/.nuget/packages/microsoft.entityframeworkcore.analyzers/9.0.1/microsoft.entityframeworkcore.analyzers.9.0.1.nupkg.sha512",
     "/Users/chukwuchinwendu/.nuget/packages/microsoft.entityframeworkcore.relational/9.0.1/microsoft.entityframeworkcore.relational.9.0.1.nupkg.sha512",
     "/Users/chukwuchinwendu/.nuget/packages/microsoft.entityframeworkcore.sqlserver/9.0.0/microsoft.entityframeworkcore.sqlserver.9.0.0.nupkg.sha512",
     "/Users/chukwuchinwendu/.nuget/packages/microsoft.extensions.caching.abstractions/9.0.1/microsoft.extensions.caching.abstractions.9.0.1.nupkg.sha512",
@@ -76,15 +76,6 @@
       "warningLevel": 1,
       "message": "Detected package version outside of dependency constraint: AutoMapper.Extensions.Microsoft.DependencyInjection 12.0.1 requires AutoMapper (= 12.0.1) but version AutoMapper 16.0.0 was resolved.",
       "libraryId": "AutoMapper",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    },
-    {
-      "code": "NU1605",
-      "level": "Error",
-      "message": "Warning As Error: Detected package downgrade: Microsoft.EntityFrameworkCore from 9.0.1 to 9.0.0. Reference the package directly from the project to select a different version. \n Ecommerce.APPLICATION -> Ecommerce.INFRASTRUCTURE -> Microsoft.EntityFrameworkCore (>= 9.0.1) \n Ecommerce.APPLICATION -> Microsoft.EntityFrameworkCore (>= 9.0.0)",
-      "libraryId": "Microsoft.EntityFrameworkCore",
       "targetGraphs": [
         "net9.0"
       ]

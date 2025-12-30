@@ -6,7 +6,7 @@ namespace Ecommerce.INFRASTRUCTURE.Repositories;
 
 public class PaymentRepository : IPaymentRepository
 {
-    public Task AddAsync(Payment entity)
+    public Task CreateAsync(Payment entity)
     {
         throw new NotImplementedException();
     }

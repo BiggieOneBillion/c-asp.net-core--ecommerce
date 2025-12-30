@@ -6,7 +6,7 @@ namespace Ecommerce.INFRASTRUCTURE.Repositories;
 
 public class OrderRepository : IOrderRepository
 {
-    public Task AddAsync(Order entity)
+    public Task CreateAsync(Order entity)
     {
         throw new NotImplementedException();
     }

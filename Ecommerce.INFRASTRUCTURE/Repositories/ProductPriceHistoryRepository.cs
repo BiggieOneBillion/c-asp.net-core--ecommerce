@@ -9,7 +9,7 @@ namespace Ecommerce.INFRASTRUCTURE.Repositories
 {
     public class ProductPriceHistoryRepository : IProductPriceHistoryRepository
     {
-        public Task AddAsync(ProductPriceHistory entity)
+        public Task CreateAsync(ProductPriceHistory entity)
         {
             throw new NotImplementedException();
         }

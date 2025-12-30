@@ -9,7 +9,7 @@ namespace Ecommerce.INFRASTRUCTURE.Repositories
 {
     public class InventoryMovementRepository : IInventoryMovementRepository
     {
-        public Task AddAsync(InventoryMovement entity)
+        public Task CreateAsync(InventoryMovement entity)
         {
             throw new NotImplementedException();
         }

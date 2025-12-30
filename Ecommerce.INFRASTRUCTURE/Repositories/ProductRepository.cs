@@ -6,7 +6,7 @@ namespace Ecommerce.INFRASTRUCTURE.Repositories;
 
 public class ProductRepository : IProductRepository
 {
-    public Task AddAsync(Product entity)
+    public Task CreateAsync(Product entity)
     {
         throw new NotImplementedException();
     }

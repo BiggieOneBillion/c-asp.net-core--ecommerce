@@ -6,7 +6,7 @@ namespace Ecommerce.INFRASTRUCTURE.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    public Task AddAsync(Users entity)
+    public Task CreateAsync(Users entity)
     {
         throw new NotImplementedException();
     }

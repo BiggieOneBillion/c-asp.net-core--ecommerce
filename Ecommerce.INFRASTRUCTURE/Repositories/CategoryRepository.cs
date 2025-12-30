@@ -1,14 +1,23 @@
 using System;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
+using Ecommerce.INFRASTRUCTURE.Data;
 
 namespace Ecommerce.INFRASTRUCTURE.Repositories;
 
 public class CategoryRepository : ICategoryRepository
 {
-    public Task AddAsync(Category entity)
+
+    private readonly ApplicationDbContext _context;
+
+    public CategoryRepository(ApplicationDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
+    }
+    async public Task CreateAsync(Category entity)
+    {
+        await _context.Categories.AddAsync(entity);
+
     }
 
     public Task DeleteAsync(Category entity)

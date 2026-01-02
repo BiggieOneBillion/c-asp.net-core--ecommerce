@@ -15,13 +15,25 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
         {
             builder.ToTable("OrderItems");
 
-            builder.HasKey(x => x.OrderItemsId.Value());
+            builder.HasKey(x => x.OrderItemsId);
 
-            builder.Property(x => x.OrderItemsId.Value()).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.OrderItemsId)
+                .HasConversion(
+                    v => v.Id,
+                    v => OrderItemsId.Create(v))
+                .IsRequired();
 
-            builder.Property(x => x.OrderId.Value()).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.OrderId)
+                .HasConversion(
+                    v => v.Id,
+                    v => OrderId.Create(v))
+                .IsRequired();
 
-            builder.Property(x => x.ProductId.Value()).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.ProductId)
+                .HasConversion(
+                    v => v.Id,
+                    v => ProductId.Create(v))
+                .IsRequired();
 
             builder.Property(x => x.Quantity).HasConversion<int>().IsRequired();
 
@@ -30,12 +42,12 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
             // Relationships
             builder.HasOne<Order>()
                 .WithMany()
-                .HasForeignKey(x => x.OrderId.Value())
+                .HasForeignKey(x => x.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne<Product>()
                   .WithMany()
-                  .HasForeignKey(x => x.ProductId.Value())
+                  .HasForeignKey(x => x.ProductId)
                   .OnDelete(DeleteBehavior.Restrict);
         }
     }

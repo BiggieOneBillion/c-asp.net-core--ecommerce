@@ -4,6 +4,7 @@ namespace Ecommerce.INFRASTRUCTURE.Data;
 
 using Microsoft.EntityFrameworkCore;
 using Ecommerce.CORE.Entity;
+using Ecommerce.INFRASTRUCTURE.Persistence;
 
 
 public class ApplicationDbContext : DbContext
@@ -22,6 +23,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Payment> Payments { get; set; } = null!;
     public DbSet<ProductPriceHistory> ProductPriceHistories {get; set;} = null!;
     public DbSet<InventoryMovement> InventoryMovements { get; set; } = null!;
+    public DbSet<OutboxMessage> OutboxMessages { get; set; } = null!;
 
     // do not forget to enable audit trail
     // public DbSet<Invitation> Invitations { get; set; } = null!;
@@ -35,29 +37,36 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
     
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        // Automatically update UpdatedAt timestamp
-        var entries = ChangeTracker.Entries()
-            .Where(e => e.State == EntityState.Modified);
-        
-        // foreach (var entry in entries)
-        // {
-        //     if (entry.Entity is Users user)
-        //         user.UpdatedAt = DateTime.UtcNow;
-        //     else if (entry.Entity is Workspace workspace)
-        //         workspace.UpdatedAt = DateTime.UtcNow;
-        //     else if (entry.Entity is ProjectEntity project)
-        //         project.UpdatedAt = DateTime.UtcNow;
-        //     else if (entry.Entity is TaskEntity task)
-        //         task.UpdatedAt = DateTime.UtcNow;
-        //     else if (entry.Entity is Comment comment)
-        //         comment.UpdatedAt = DateTime.UtcNow;
-        //     else if (entry.Entity is Note note)
-        //         note.UpdatedAt = DateTime.UtcNow;
-        // }
-        
-        return base.SaveChangesAsync(cancellationToken);
+        // 1. Collect domain events from aggregate roots
+        var domainEvents = ChangeTracker
+            .Entries<CORE.Common.AggregateRoot<object>>()
+            .Where(e => e.Entity.DomainEvents.Any())
+            .SelectMany(e => e.Entity.DomainEvents)
+            .ToList();
+
+        // 2. Convert to outbox messages
+        var outboxMessages = domainEvents.Select(domainEvent => new OutboxMessage
+        {
+            Id = Guid.NewGuid(),
+            Type = domainEvent.GetType().AssemblyQualifiedName!,
+            Content = System.Text.Json.JsonSerializer.Serialize(domainEvent, domainEvent.GetType()),
+            OccurredOn = domainEvent.OccurredOn
+        }).ToList();
+
+        if (outboxMessages.Any())
+        {
+            await OutboxMessages.AddRangeAsync(outboxMessages, cancellationToken);
+        }
+
+        // 3. Clear domain events after capturing
+        foreach (var entry in ChangeTracker.Entries<CORE.Common.AggregateRoot<object>>())
+        {
+            entry.Entity.ClearDomainEvents();
+        }
+
+        return await base.SaveChangesAsync(cancellationToken);
     }
 }
 

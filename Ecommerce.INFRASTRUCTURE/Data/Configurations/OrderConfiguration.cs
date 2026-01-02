@@ -14,23 +14,35 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
         {
             builder.ToTable("Orders");
 
-            builder.HasKey(x => x.OrderId.Value());
+            builder.HasKey(x => x.OrderId);
 
-            builder.Property(x => x.OrderId.Value()).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.OrderId)
+                .HasConversion(
+                    v => v.Id,
+                    v => OrderId.Create(v))
+                .IsRequired();
 
-            builder.Property(x => x.UserId.Value()).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.UserId)
+                .HasConversion(
+                    v => v.Id,
+                    v => UserId.Create(v))
+                .IsRequired();
 
-            builder.Property(x => x.PaymentId.Value()).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.PaymentId)
+                .HasConversion(
+                    v => v.Id,
+                    v => PaymentId.Create(v))
+                .IsRequired();
 
             // Relationships
             builder.HasOne<Users>()
                 .WithMany()
-                .HasForeignKey(x => x.UserId.Value())
+                .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne<Payment>()
                    .WithMany()
-                   .HasForeignKey(x => x.PaymentId.Value())
+                   .HasForeignKey(x => x.PaymentId)
                    .OnDelete(DeleteBehavior.Restrict);
 
         }

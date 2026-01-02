@@ -15,10 +15,12 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
         {
             builder.ToTable("Products");
             
-            builder.HasKey(p => p.ProductId.Value());
+            builder.HasKey(p => p.ProductId);
             
-            builder.Property(p => p.ProductId.Value())
-                .HasMaxLength(50)
+            builder.Property(p => p.ProductId)
+                .HasConversion(
+                    v => v.Id,
+                    v => ProductId.Create(v))
                 .IsRequired();
             
             builder.Property(p => p.Name)
@@ -32,14 +34,16 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
                 .HasColumnType("decimal(18,2)")
                 .IsRequired();
             
-            builder.Property(p => p.CategoryId.Value())
-                .HasMaxLength(50)
+            builder.Property(p => p.CategoryId)
+                .HasConversion(
+                    v => v.Id,
+                    v => CategoryId.Create(v))
                 .IsRequired();
             
             // Relationships
             builder.HasOne<Category>()
                 .WithMany()
-                .HasForeignKey(p => p.CategoryId.Value())
+                .HasForeignKey(p => p.CategoryId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

@@ -10,11 +10,19 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
         {
             builder.ToTable("InventoryMovements");
 
-            builder.HasKey(x => x.InventoryMovementId.Value());
+            builder.HasKey(x => x.InventoryMovementId);
 
-            builder.Property(x => x.InventoryMovementId.Value()).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.InventoryMovementId)
+                .HasConversion(
+                    v => v.Id,
+                    v => InventoryMovementId.Create(v))
+                .IsRequired();
 
-            builder.Property(x => x.ProductId.Value()).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.ProductId)
+                .HasConversion(
+                    v => v.Id,
+                    v => ProductId.Create(v))
+                .IsRequired();
 
             builder.Property(x => x.QuantityChanged).HasConversion<int>().IsRequired();
 
@@ -27,7 +35,7 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
             // Relationships
             builder.HasOne<Product>()
                 .WithMany()
-                .HasForeignKey(x => x.ProductId.Value())
+                .HasForeignKey(x => x.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

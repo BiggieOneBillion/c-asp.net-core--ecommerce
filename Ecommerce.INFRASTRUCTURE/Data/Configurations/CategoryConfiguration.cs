@@ -14,9 +14,13 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
         {
             builder.ToTable("Categories");
 
-            builder.HasKey(x => x.CategoryId.Value());
+            builder.HasKey(x => x.CategoryId);
 
-            builder.Property(x => x.CategoryId.Value()).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.CategoryId)
+                .HasConversion(
+                    v => v.Id,
+                    v => CategoryId.Create(v))
+                .IsRequired();
 
             builder.Property(x => x.CategoryName).HasMaxLength(100).IsRequired();
 

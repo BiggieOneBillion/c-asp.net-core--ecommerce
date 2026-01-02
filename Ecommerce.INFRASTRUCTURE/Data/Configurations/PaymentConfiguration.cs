@@ -15,22 +15,30 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
 
             builder.ToTable("Payments");
 
-            builder.HasKey(x => x.PaymentId.Value());
+            builder.HasKey(x => x.PaymentId);
 
-            builder.Property(x => x.PaymentId.Value()).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.PaymentId)
+                .HasConversion(
+                    v => v.Id,
+                    v => PaymentId.Create(v))
+                .IsRequired();
 
             builder.Property(x => x.Amount).HasColumnType("decimal(18,2)");
 
             builder.Property(x => x.PaymentDate).HasColumnType("datetime2");
 
-            builder.Property(x => x.OrderId.Value()).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.OrderId)
+                .HasConversion(
+                    v => v.Id,
+                    v => OrderId.Create(v))
+                .IsRequired();
 
             builder.Property(x => x.PaymentType).HasConversion<int>().IsRequired();
 
             // Relationships
             builder.HasOne<Order>()
                 .WithMany()
-                .HasForeignKey(x => x.OrderId.Value())
+                .HasForeignKey(x => x.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

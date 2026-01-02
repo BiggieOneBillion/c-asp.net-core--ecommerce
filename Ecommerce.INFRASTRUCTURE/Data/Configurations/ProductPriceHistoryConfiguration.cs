@@ -15,11 +15,19 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
 
             builder.ToTable("ProductPriceHistory");
 
-            builder.HasKey(x => x.ProductPriceHistoryId.Value());
+            builder.HasKey(x => x.ProductPriceHistoryId);
 
-            builder.Property(x => x.ProductPriceHistoryId.Value()).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.ProductPriceHistoryId)
+                .HasConversion(
+                    v => v.Id,
+                    v => ProductPriceHistoryId.Create(v))
+                .IsRequired();
 
-            builder.Property(x => x.ProductId.Value()).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.ProductId)
+                .HasConversion(
+                    v => v.Id,
+                    v => ProductId.Create(v))
+                .IsRequired();
 
             builder.Property(x => x.NewPrice).HasColumnType("decimal(18,2)");
 
@@ -30,7 +38,7 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
             // Relationships
             builder.HasOne<Product>()
                 .WithMany()
-                .HasForeignKey(x => x.ProductId.Value())
+                .HasForeignKey(x => x.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

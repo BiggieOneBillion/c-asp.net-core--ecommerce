@@ -15,24 +15,32 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
         {
             builder.ToTable("Inventories");
 
-            builder.HasKey(x => x.InventoryId.Value());
+            builder.HasKey(x => x.InventoryId);
 
-            builder.Property(x => x.InventoryId.Value()).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.InventoryId)
+                .HasConversion(
+                    v => v.Id,
+                    v => InventoryId.Create(v))
+                .IsRequired();
 
-            builder.Property(x => x.ProductId.Value()).HasMaxLength(50).IsRequired();
+            builder.Property(x => x.ProductId)
+                .HasConversion(
+                    v => v.Id,
+                    v => ProductId.Create(v))
+                .IsRequired();
 
             builder.Property(x => x.StockQuantity).HasConversion<int>().IsRequired();
 
             builder.Property(x => x.ReservedQuantity).HasConversion<int>().IsRequired();
 
-            builder.HasIndex(x => x.ProductId.Value()).IsUnique();
+            builder.HasIndex(x => x.ProductId).IsUnique();
 
             // builder.Property(x => x.InventoryType).HasConversion<int>().IsRequired();
 
             // Relationships
             builder.HasOne<Product>()
                 .WithMany()
-                .HasForeignKey(x => x.ProductId.Value())
+                .HasForeignKey(x => x.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

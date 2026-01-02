@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Hangfire;
+using Hangfire.PostgreSql;
+using Ecommerce.INFRASTRUCTURE.BackgroundJobs;
 
 namespace Ecommerce.INFRASTRUCTURE;
 
@@ -36,6 +39,18 @@ public static  class DependencyInjection
         services.AddScoped<IInventoryMovementRepository, InventoryMovementRepository>();
         // Unit of Work
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // Background Jobs
+        services.AddScoped<ProcessOutboxMessagesJob>();
+
+        // Hangfire
+        services.AddHangfire(config => config
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UsePostgreSqlStorage(configureOptions.GetConnectionString("DefaultConnection")));
+
+        services.AddHangfireServer();
         
         return services;
     }

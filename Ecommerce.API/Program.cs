@@ -1,5 +1,7 @@
 using Ecommerce.APPLICATION;
 using Ecommerce.INFRASTRUCTURE;
+using Ecommerce.INFRASTRUCTURE.BackgroundJobs;
+using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,6 +78,19 @@ app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 
 app.MapControllers();
+
+// Hangfire Dashboard
+app.UseHangfireDashboard();
+
+// Schedule Recurring Job
+using (var scope = app.Services.CreateScope())
+{
+    var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+    recurringJobManager.AddOrUpdate<ProcessOutboxMessagesJob>(
+        "outbox-processor",
+        job => job.Execute(),
+        Cron.Minutely);
+}
 
 app.Logger.LogInformation("Starting Ecommerce API...");
 app.Logger.LogInformation("CQRS Architecture: MediatR + FluentValidation + AutoMapper");

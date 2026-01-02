@@ -1,25 +1,50 @@
-using System;
+using Ecommerce.CORE.Common;
+using Ecommerce.CORE.DomainEvents;
 using Ecommerce.CORE.ValueObjects;
 
 namespace Ecommerce.CORE.Entity;
 
-public class Product
+public class Product : AggregateRoot<ProductId>
 {
-   public string Name { get; set; } = string.Empty;
-   public string Description { get; set; } = string.Empty;
-
-   public  CategoryId CategoryId { get; set; }
-
-   public decimal CurrentPrice { get; set; }
-
-   public ProductId ProductId { get; set; } = new ProductId();
-
-   public Product(string name, string description, Guid productId, CategoryId categoryId, decimal price )
-   {
-      Name = name;
-      Description = description;
-      ProductId = ProductId.Create(productId);
-      CategoryId = categoryId;
-      CurrentPrice = price;
-   }
+    public string Name { get; private set; } = string.Empty;
+    public string Description { get; private set; } = string.Empty;
+    public CategoryId CategoryId { get; private set; } = null!;
+    public decimal CurrentPrice { get; private set; }
+    
+    // Private constructor for EF Core
+    private Product() { }
+    
+    // Factory method
+    public static Product Create(string name, string description, CategoryId categoryId, decimal price)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new DomainException("Product name is required");
+        
+        if (price <= 0)
+            throw new DomainException("Product price must be greater than zero");
+        
+        return new Product
+        {
+            Id = ProductId.Create(Guid.NewGuid()),
+            Name = name,
+            Description = description,
+            CategoryId = categoryId,
+            CurrentPrice = price
+        };
+    }
+    
+    public void UpdatePrice(decimal newPrice)
+    {
+        if (newPrice <= 0)
+            throw new DomainException("Price must be greater than zero");
+        
+        var oldPrice = CurrentPrice;
+        CurrentPrice = newPrice;
+        
+        RaiseDomainEvent(new ProductPriceChangedDomainEvent(
+            Guid.Parse(Id.Value()), 
+            oldPrice, 
+            newPrice
+        ));
+    }
 }

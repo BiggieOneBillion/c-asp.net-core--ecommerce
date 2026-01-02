@@ -8,11 +8,11 @@ namespace Ecommerce.APPLICATION.Features.Orders.Commands.CreateOrder;
 
 public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Result<Guid>>
 {
-    private readonly IOrderRepository _orderRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateOrderCommandHandler(IOrderRepository orderRepository)
+    public CreateOrderCommandHandler(IUnitOfWork unitOfWork)
     {
-        _orderRepository = orderRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<Guid>> Handle(
@@ -21,15 +21,27 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
     {
         try
         {
-            var orderId = Guid.NewGuid();
             var userId = UserId.Create(request.UserId);
             var paymentId = PaymentId.Create(request.PaymentId);
 
-            var order = new Order(orderId, userId, paymentId);
+            var items = request.Items.Select(i => new OrderItems(
+                OrderId.Create(Guid.Empty), // Will be set by factory
+                ProductId.Create(i.ProductId),
+                i.Quantity,
+                i.PricePerUnit
+            )).ToList();
 
-            await _orderRepository.CreateAsync(order);
+            var order = Order.Create(userId, paymentId, items);
 
-            return Result.Success(orderId);
+            await _unitOfWork.Orders.CreateAsync(order);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return Result.Success(order.Id.Id);
+        }
+        catch (DomainException ex)
+        {
+            return Result.Failure<Guid>(
+                new Error("Order.DomainError", ex.Message));
         }
         catch (Exception ex)
         {

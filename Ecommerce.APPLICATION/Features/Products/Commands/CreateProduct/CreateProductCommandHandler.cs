@@ -8,11 +8,11 @@ namespace Ecommerce.APPLICATION.Features.Products.Commands.CreateProduct;
 
 public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Result<Guid>>
 {
-    private readonly IProductRepository _productRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateProductCommandHandler(IProductRepository productRepository)
+    public CreateProductCommandHandler(IUnitOfWork unitOfWork)
     {
-        _productRepository = productRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<Guid>> Handle(
@@ -21,19 +21,23 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
     {
         try
         {
-            var productId = Guid.NewGuid();
             var categoryId = CategoryId.Create(request.CategoryId);
 
-            var product = new Product(
+            var product = Product.Create(
                 request.Name,
                 request.Description,
-                productId,
                 categoryId,
                 request.CurrentPrice);
 
-            await _productRepository.CreateAsync(product);
+            await _unitOfWork.Products.CreateAsync(product);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(productId);
+            return Result.Success(product.Id.Id);
+        }
+        catch (DomainException ex)
+        {
+            return Result.Failure<Guid>(
+                new Error("Product.DomainError", ex.Message));
         }
         catch (Exception ex)
         {

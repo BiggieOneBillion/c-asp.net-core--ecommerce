@@ -1,6 +1,7 @@
 using Ecommerce.APPLICATION.Features.Products.Commands.CreateProduct;
 using Ecommerce.APPLICATION.Features.Products.Commands.DeleteProduct;
 using Ecommerce.APPLICATION.Features.Products.Commands.UpdateProduct;
+using Ecommerce.APPLICATION.Features.Products.Commands.UpdateProductPrice;
 using Ecommerce.APPLICATION.Features.Products.Queries.GetAllProducts;
 using Ecommerce.APPLICATION.Features.Products.Queries.GetProductById;
 using Ecommerce.APPLICATION.Features.Products.Queries.GetProductsByCategory;
@@ -151,4 +152,29 @@ public class ProductsController : ControllerBase
 
         return NoContent();
     }
+
+    /// <summary>
+    /// Update product price with history tracking
+    /// </summary>
+    /// <param name="id">Product ID</param>
+    /// <param name="request">New price details</param>
+    /// <returns>Success message</returns>
+    [HttpPatch("{id:guid}/price")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdatePrice(Guid id, [FromBody] UpdateProductPriceRequest request)
+    {
+        var command = new UpdateProductPriceCommand(id, request.NewPrice);
+        var result = await _mediator.Send(command);
+
+        if (result.IsFailure)
+            return result.Error.Code == "Product.NotFound" 
+                ? NotFound(new { error = result.Error.Message })
+                : BadRequest(new { error = result.Error.Message });
+
+        return Ok(new { message = "Product price updated successfully" });
+    }
 }
+
+public record UpdateProductPriceRequest(decimal NewPrice);

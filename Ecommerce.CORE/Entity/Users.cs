@@ -13,6 +13,8 @@ public class Users
 
    public UserId Id { get; set; }
 
+   private Users() { }
+
    public Users(string name, string email, string password, Guid userId)
     {
         Name = name;

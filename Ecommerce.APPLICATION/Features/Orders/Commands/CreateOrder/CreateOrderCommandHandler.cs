@@ -1,4 +1,5 @@
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.CORE.Common;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
@@ -9,10 +10,12 @@ namespace Ecommerce.APPLICATION.Features.Orders.Commands.CreateOrder;
 public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Result<Guid>>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IOrderRepository _orderRepository;
 
-    public CreateOrderCommandHandler(IUnitOfWork unitOfWork)
+    public CreateOrderCommandHandler(IUnitOfWork unitOfWork, IOrderRepository orderRepository)
     {
         _unitOfWork = unitOfWork;
+        _orderRepository = orderRepository;
     }
 
     public async Task<Result<Guid>> Handle(
@@ -24,7 +27,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
             var userId = UserId.Create(request.UserId);
             var paymentId = PaymentId.Create(request.PaymentId);
 
-            var items = request.Items.Select(i => new OrderItems(
+            var items = request.Items.Select(i => new CORE.Entity.OrderItems(
                 OrderId.Create(Guid.Empty), // Will be set by factory
                 ProductId.Create(i.ProductId),
                 i.Quantity,
@@ -33,7 +36,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
 
             var order = Order.Create(userId, paymentId, items);
 
-            await _unitOfWork.Orders.CreateAsync(order);
+            await _orderRepository.CreateAsync(order);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return Result.Success(order.Id.Id);

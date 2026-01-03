@@ -32,11 +32,7 @@ public class UpdateProductPriceHistoryCommandHandler : IRequestHandler<UpdatePro
 
             var productId = ProductId.Create(request.ProductId);
 
-            priceHistory.ProductId = productId;
-            priceHistory.NewPrice = request.NewPrice;
-            priceHistory.OldPrice = request.OldPrice;
-            priceHistory.EffectiveDate = request.EffectiveDate;
-            priceHistory.ChangedAt = request.ChangedAt;
+            priceHistory.UpdateDetails(productId, request.NewPrice, request.OldPrice, request.EffectiveDate, request.ChangedAt);
 
             await _priceHistoryRepository.UpdateAsync(priceHistory);
 

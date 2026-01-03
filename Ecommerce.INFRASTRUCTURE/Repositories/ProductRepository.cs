@@ -1,43 +1,56 @@
 using System;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
+using Ecommerce.INFRASTRUCTURE.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.INFRASTRUCTURE.Repositories;
 
 public class ProductRepository : IProductRepository
 {
-    public Task CreateAsync(Product entity)
+    private readonly ApplicationDbContext _context;
+
+    public ProductRepository(ApplicationDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
     }
 
-    public Task DeleteAsync(Product entity)
+    public async Task CreateAsync(Product entity)
     {
-        throw new NotImplementedException();
+        await _context.Products.AddAsync(entity);
     }
 
-    public Task<IEnumerable<Product>> GetAllAsync()
+    public async Task DeleteAsync(Product entity)
     {
-        throw new NotImplementedException();
+        _context.Products.Remove(entity);
+        await Task.CompletedTask;
     }
 
-    public Task<IEnumerable<Product>> GetByCategoryAsync(Guid categoryId)
+    public async Task<IEnumerable<Product>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return await _context.Products.ToListAsync();
     }
 
-    public Task<Product?> GetByIdAsync(Guid id)
+    public async Task<IEnumerable<Product>> GetByCategoryAsync(Guid categoryId)
     {
-        throw new NotImplementedException();
+        return await _context.Products
+            .Where(p => p.CategoryId.Id == categoryId)
+            .ToListAsync();
     }
 
-    public Task<Product?> GetProductByNameAsync(string productName)
+    public async Task<Product?> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return await _context.Products.FirstOrDefaultAsync(p => p.Id.Id == id);
     }
 
-    public Task UpdateAsync(Product entity)
+    public async Task<Product?> GetProductByNameAsync(string productName)
     {
-        throw new NotImplementedException();
+        return await _context.Products.FirstOrDefaultAsync(p => p.Name == productName);
+    }
+
+    public async Task UpdateAsync(Product entity)
+    {
+        _context.Products.Update(entity);
+        await Task.CompletedTask;
     }
 }

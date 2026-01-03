@@ -5,21 +5,19 @@ namespace Ecommerce.CORE.Entity;
 
 public class OrderItems
 {
-   public OrderItemsId OrderItemsId { get; set; }
+    public OrderItemsId Id { get; private set; } = null!;
+    public OrderId OrderId { get; private set; } = null!;
+    public ProductId ProductId { get; private set; } = null!;
+    public int Quantity { get; private set; }
+    public decimal PricePerUnitAtPurchaseTime { get; private set; }
+    public DateTime CreateAt { get; private set; }
 
-   public OrderId OrderId { get; set; }
-
-   public ProductId ProductId { get; set; }
-
-   public int Quantity { get; set; } = 1;
-
-   public decimal PricePerUnitAtPurchaseTime { get; set; }
-
-   public DateTime CreateAt { get; set; }
+    // Private constructor for EF Core
+    private OrderItems() { }
 
     public OrderItems(OrderId orderId, ProductId productId, int quantity, decimal pricePerUnitAtPurchaseTime)
     {
-        OrderItemsId = OrderItemsId.Create(Guid.NewGuid());
+        Id = OrderItemsId.Create(Guid.NewGuid());
         OrderId = orderId;
         ProductId = productId;
         Quantity = quantity;
@@ -27,5 +25,15 @@ public class OrderItems
         CreateAt = DateTime.UtcNow;
     }
 
-
+    public void Update( 
+        OrderId orderId,
+        ProductId productId,
+        int quantity,
+        DateTime createAt)
+    {
+        OrderId = orderId;
+        ProductId = productId;
+        Quantity = quantity;
+        CreateAt = createAt;
+    }   
 }

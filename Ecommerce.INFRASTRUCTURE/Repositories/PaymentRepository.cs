@@ -1,33 +1,46 @@
 using System;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
+using Ecommerce.INFRASTRUCTURE.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.INFRASTRUCTURE.Repositories;
 
 public class PaymentRepository : IPaymentRepository
 {
-    public Task CreateAsync(Payment entity)
+    private readonly ApplicationDbContext _context;
+
+    public PaymentRepository(ApplicationDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
     }
 
-    public Task DeleteAsync(Payment entity)
+    public async Task CreateAsync(Payment entity)
     {
-        throw new NotImplementedException();
+        await _context.Payments.AddAsync(entity);
     }
 
-    public Task<Payment?> GetByIdAsync(Guid id)
+    public async Task DeleteAsync(Payment entity)
     {
-        throw new NotImplementedException();
+        _context.Payments.Remove(entity);
+        await Task.CompletedTask;
     }
 
-    public Task<IEnumerable<Payment>> GetByOrderIdAsync(Guid orderId)
+    public async Task<Payment?> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return await _context.Payments.FirstOrDefaultAsync(p => p.Id.Id == id);
     }
 
-    public Task UpdateAsync(Payment entity)
+    public async Task<IEnumerable<Payment>> GetByOrderIdAsync(Guid orderId)
     {
-        throw new NotImplementedException();
+        return await _context.Payments
+            .Where(p => p.OrderId.Id == orderId)
+            .ToListAsync();
+    }
+
+    public async Task UpdateAsync(Payment entity)
+    {
+        _context.Payments.Update(entity);
+        await Task.CompletedTask;
     }
 }

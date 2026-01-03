@@ -1,5 +1,6 @@
 using Ecommerce.APPLICATION.Common.Models;
 using Ecommerce.CORE.Common;
+using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
 using MediatR;

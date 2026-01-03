@@ -6,6 +6,5 @@ public record UpdateProductCommand(
     Guid ProductId,
     string Name,
     string Description,
-    Guid CategoryId,
-    decimal CurrentPrice
+    Guid CategoryId
 ) : ICommand;

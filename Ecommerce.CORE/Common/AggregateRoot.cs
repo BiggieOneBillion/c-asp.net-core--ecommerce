@@ -1,6 +1,12 @@
 namespace Ecommerce.CORE.Common;
 
-public abstract class AggregateRoot<TId>
+public interface IAggregateRoot
+{
+    IReadOnlyCollection<IDomainEvent> DomainEvents { get; }
+    void ClearDomainEvents();
+}
+
+public abstract class AggregateRoot<TId> : IAggregateRoot
 {
     private readonly List<IDomainEvent> _domainEvents = new();
     

@@ -4,34 +4,47 @@ using System.Linq;
 using System.Threading.Tasks;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
+using Ecommerce.INFRASTRUCTURE.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.INFRASTRUCTURE.Repositories
 {
     public class InventoryMovementRepository : IInventoryMovementRepository
     {
-        public Task CreateAsync(InventoryMovement entity)
+        private readonly ApplicationDbContext _context;
+
+        public InventoryMovementRepository(ApplicationDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
 
-        public Task DeleteAsync(InventoryMovement entity)
+        public async Task CreateAsync(InventoryMovement entity)
         {
-            throw new NotImplementedException();
+            await _context.InventoryMovements.AddAsync(entity);
         }
 
-        public Task<InventoryMovement?> GetByIdAsync(Guid id)
+        public async Task DeleteAsync(InventoryMovement entity)
         {
-            throw new NotImplementedException();
+            _context.InventoryMovements.Remove(entity);
+            await Task.CompletedTask;
         }
 
-        public Task<IEnumerable<InventoryMovement>> GetByProductIdAsync(Guid productId)
+        public async Task<InventoryMovement?> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return await _context.InventoryMovements.FirstOrDefaultAsync(i => i.Id.Id == id);
         }
 
-        public Task UpdateAsync(InventoryMovement entity)
+        public async Task<IEnumerable<InventoryMovement>> GetByProductIdAsync(Guid productId)
         {
-            throw new NotImplementedException();
+            return await _context.InventoryMovements
+                .Where(i => i.ProductId.Id == productId)
+                .ToListAsync();
+        }
+
+        public async Task UpdateAsync(InventoryMovement entity)
+        {
+            _context.InventoryMovements.Update(entity);
+            await Task.CompletedTask;
         }
     }
 }

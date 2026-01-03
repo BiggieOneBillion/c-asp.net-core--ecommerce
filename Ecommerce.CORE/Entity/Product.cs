@@ -6,10 +6,10 @@ namespace Ecommerce.CORE.Entity;
 
 public class Product : AggregateRoot<ProductId>
 {
-    public string Name { get; private set; } = string.Empty;
-    public string Description { get; private set; } = string.Empty;
-    public CategoryId CategoryId { get; private set; } = null!;
-    public decimal CurrentPrice { get; private set; }
+    public string Name { get;  set; } = string.Empty;
+    public string Description { get;  set; } = string.Empty;
+    public CategoryId CategoryId { get;  set; } = null!;
+    public decimal CurrentPrice { get;  set; }
     
     // Private constructor for EF Core
     private Product() { }

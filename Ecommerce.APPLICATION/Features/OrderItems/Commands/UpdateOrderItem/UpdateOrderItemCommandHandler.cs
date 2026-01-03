@@ -33,10 +33,8 @@ public class UpdateOrderItemCommandHandler : IRequestHandler<UpdateOrderItemComm
             var orderId = OrderId.Create(request.OrderId);
             var productId = ProductId.Create(request.ProductId);
 
-            orderItem.OrderId = orderId;
-            orderItem.ProductId = productId;
-            orderItem.Quantity = request.Quantity;
-            orderItem.CreateAt = request.CreateAt;
+            // Call the Update method on the orderItem instance
+            orderItem.Update( orderId, productId, request.Quantity, request.CreateAt);
 
             await _orderItemsRepository.UpdateAsync(orderItem);
 

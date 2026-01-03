@@ -1,33 +1,46 @@
 using System;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
+using Ecommerce.INFRASTRUCTURE.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.INFRASTRUCTURE.Repositories;
 
 public class OrderItemsRepository : IOrderItemsRepository
 {
-    public Task CreateAsync(OrderItems entity)
+    private readonly ApplicationDbContext _context;
+
+    public OrderItemsRepository(ApplicationDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
     }
 
-    public Task DeleteAsync(OrderItems entity)
+    public async Task CreateAsync(OrderItems entity)
     {
-        throw new NotImplementedException();
+        await _context.OrderItems.AddAsync(entity);
     }
 
-    public Task<OrderItems?> GetByIdAsync(Guid id)
+    public async Task DeleteAsync(OrderItems entity)
     {
-        throw new NotImplementedException();
+        _context.OrderItems.Remove(entity);
+        await Task.CompletedTask;
     }
 
-    public Task<IEnumerable<OrderItems>> GetByOrderIdAsync(Guid orderId)
+    public async Task<OrderItems?> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return await _context.OrderItems.FirstOrDefaultAsync(o => o.Id.Id == id);
     }
 
-    public Task UpdateAsync(OrderItems entity)
+    public async Task<IEnumerable<OrderItems>> GetByOrderIdAsync(Guid orderId)
     {
-        throw new NotImplementedException();
+        return await _context.OrderItems
+            .Where(o => o.OrderId.Id == orderId)
+            .ToListAsync();
+    }
+
+    public async Task UpdateAsync(OrderItems entity)
+    {
+        _context.OrderItems.Update(entity);
+        await Task.CompletedTask;
     }
 }

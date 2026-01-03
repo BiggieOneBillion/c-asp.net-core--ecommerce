@@ -11,7 +11,7 @@ public class Inventory : AggregateRoot<InventoryId>
     public ProductId ProductId { get; private set; } = null!;
     public int StockQuantity { get; private set; }
     public int ReservedQuantity { get; private set; }
-    
+
     // Private constructor for EF Core
     private Inventory() { }
     

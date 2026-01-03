@@ -4,34 +4,47 @@ using System.Linq;
 using System.Threading.Tasks;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
+using Ecommerce.INFRASTRUCTURE.Data; // Assuming ApplicationDbContext is in this namespace
+using Microsoft.EntityFrameworkCore; // Required for EF Core methods
 
 namespace Ecommerce.INFRASTRUCTURE.Repositories
 {
     public class ProductPriceHistoryRepository : IProductPriceHistoryRepository
     {
-        public Task CreateAsync(ProductPriceHistory entity)
+        private readonly ApplicationDbContext _context;
+
+        public ProductPriceHistoryRepository(ApplicationDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
 
-        public Task DeleteAsync(ProductPriceHistory entity)
+        public async Task CreateAsync(ProductPriceHistory entity)
         {
-            throw new NotImplementedException();
+            await _context.ProductPriceHistories.AddAsync(entity);
         }
 
-        public Task<ProductPriceHistory?> GetByIdAsync(Guid id)
+        public async Task DeleteAsync(ProductPriceHistory entity)
         {
-            throw new NotImplementedException();
+            _context.ProductPriceHistories.Remove(entity);
+            await Task.CompletedTask;
         }
 
-        public Task<IEnumerable<ProductPriceHistory>> GetByProductIdAsync(Guid productId)
+        public async Task<ProductPriceHistory?> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return await _context.ProductPriceHistories.FirstOrDefaultAsync(p => p.Id.Id == id);
         }
 
-        public Task UpdateAsync(ProductPriceHistory entity)
+        public async Task<IEnumerable<ProductPriceHistory>> GetByProductIdAsync(Guid productId)
         {
-            throw new NotImplementedException();
+            return await _context.ProductPriceHistories
+                .Where(p => p.ProductId.Id == productId)
+                .ToListAsync();
+        }
+
+        public async Task UpdateAsync(ProductPriceHistory entity)
+        {
+            _context.ProductPriceHistories.Update(entity);
+            await Task.CompletedTask;
         }
     }
 }

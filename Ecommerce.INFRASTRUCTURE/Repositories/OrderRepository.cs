@@ -1,33 +1,46 @@
 using System;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
+using Ecommerce.INFRASTRUCTURE.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.INFRASTRUCTURE.Repositories;
 
 public class OrderRepository : IOrderRepository
 {
-    public Task CreateAsync(Order entity)
+    private readonly ApplicationDbContext _context;
+
+    public OrderRepository(ApplicationDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
     }
 
-    public Task DeleteAsync(Order entity)
+    public async Task CreateAsync(Order entity)
     {
-        throw new NotImplementedException();
+        await _context.Orders.AddAsync(entity);
     }
 
-    public Task<Order?> GetByIdAsync(Guid id)
+    public async Task DeleteAsync(Order entity)
     {
-        throw new NotImplementedException();
+        _context.Orders.Remove(entity);
+        await Task.CompletedTask;
     }
 
-    public Task<IEnumerable<Order>> GetByUserIdAsync(Guid userId)
+    public async Task<Order?> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return await _context.Orders.FirstOrDefaultAsync(o => o.Id.Id == id);
     }
 
-    public Task UpdateAsync(Order entity)
+    public async Task<IEnumerable<Order>> GetByUserIdAsync(Guid userId)
     {
-        throw new NotImplementedException();
+        return await _context.Orders
+            .Where(o => o.UserId.Id == userId)
+            .ToListAsync();
+    }
+
+    public async Task UpdateAsync(Order entity)
+    {
+        _context.Orders.Update(entity);
+        await Task.CompletedTask;
     }
 }

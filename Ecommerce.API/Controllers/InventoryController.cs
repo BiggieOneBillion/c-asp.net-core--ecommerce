@@ -71,16 +71,18 @@ public class InventoryController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateInventory(Guid id, [FromBody] UpdateInventoryCommand command)
+    public async Task<IActionResult> UpdateInventory(Guid id, [FromBody] UpdateInventoryCommand command) //! i dont think this is necessary.
     {
-        if (id != command.InventoryId)
-            return BadRequest(new { error = "Inventory ID mismatch" });
 
-        var result = await _mediator.Send(command);
+        return BadRequest("Endpoint disabled");
+        // if (id != command.InventoryId)
+        //     return BadRequest(new { error = "Inventory ID mismatch" });
 
-        if (result.IsFailure)
-            return NotFound(new { error = result.Error.Message });
+        // var result = await _mediator.Send(command);
 
-        return Ok(new { message = "Inventory updated successfully" });
+        // if (result.IsFailure)
+        //     return NotFound(new { error = result.Error.Message });
+
+        // return Ok(new { message = "Inventory updated successfully" });
     }
 }

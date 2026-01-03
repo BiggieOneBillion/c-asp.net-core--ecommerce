@@ -24,11 +24,10 @@ public class CreateInventoryCommandHandler : IRequestHandler<CreateInventoryComm
             var inventoryId = Guid.NewGuid();
             var productId = ProductId.Create(request.ProductId);
 
-            var inventory = new CORE.Entity.Inventory(
+            var inventory = CORE.Entity.Inventory.Create(
                 productId: productId,
-                inventoryId:inventoryId,
-                request.StockQuantity,
-                request.ReservedQuantity);
+                request.StockQuantity
+                );
 
             await _inventoryRepository.CreateAsync(inventory);
 

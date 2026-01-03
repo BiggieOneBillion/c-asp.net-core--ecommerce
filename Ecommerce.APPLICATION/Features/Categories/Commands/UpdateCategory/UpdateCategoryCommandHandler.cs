@@ -29,9 +29,7 @@ public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryComman
                     new Error("Category.NotFound", $"Category with ID {request.CategoryId} not found"));
             }
 
-            category.CategoryName = request.CategoryName;
-            category.CategoryDescription = request.CategoryDescription;
-            category.ActiveStatus = request.ActiveStatus;
+            category.UpdateDetails(request.CategoryName, request.CategoryDescription, request.ActiveStatus);
 
             await _categoryRepository.UpdateAsync(category);
 

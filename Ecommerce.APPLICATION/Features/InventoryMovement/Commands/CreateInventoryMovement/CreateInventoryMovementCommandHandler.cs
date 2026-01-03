@@ -24,11 +24,11 @@ public class CreateInventoryMovementCommandHandler : IRequestHandler<CreateInven
             var movementId = Guid.NewGuid();
             var productId = ProductId.Create(request.ProductId);
 
-            var inventoryMovement = new CORE.Entity.InventoryMovement(
+            var inventoryMovement = CORE.Entity.InventoryMovement.Create(
                 productId:productId,
                 quantityChanged:request.QuantityChanged,
                 movementType:request.MovementType,
-                reason:request.Reason);
+                reason:request.Reason!);
 
             await _inventoryMovementRepository.CreateAsync(inventoryMovement);
 

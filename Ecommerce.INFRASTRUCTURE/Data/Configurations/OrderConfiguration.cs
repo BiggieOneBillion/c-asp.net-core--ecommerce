@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Ecommerce.CORE.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Ecommerce.CORE.ValueObjects;
 
 namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
 {
@@ -14,9 +15,9 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
         {
             builder.ToTable("Orders");
 
-            builder.HasKey(x => x.OrderId);
+            builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.OrderId)
+            builder.Property(x => x.Id)
                 .HasConversion(
                     v => v.Id,
                     v => OrderId.Create(v))
@@ -30,7 +31,7 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
 
             builder.Property(x => x.PaymentId)
                 .HasConversion(
-                    v => v.Id,
+                    v => v!.Id,
                     v => PaymentId.Create(v))
                 .IsRequired();
 

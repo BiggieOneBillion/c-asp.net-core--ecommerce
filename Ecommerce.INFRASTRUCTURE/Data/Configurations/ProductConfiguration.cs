@@ -6,6 +6,7 @@ using Ecommerce.CORE.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Ecommerce.CORE.ValueObjects;
 
 namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
 {
@@ -15,9 +16,9 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
         {
             builder.ToTable("Products");
             
-            builder.HasKey(p => p.ProductId);
+            builder.HasKey(p => p.Id);
             
-            builder.Property(p => p.ProductId)
+            builder.Property(p => p.Id)
                 .HasConversion(
                     v => v.Id,
                     v => ProductId.Create(v))

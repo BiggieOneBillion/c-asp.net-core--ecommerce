@@ -15,7 +15,7 @@ public class UpdateInventoryCommandHandler : IRequestHandler<UpdateInventoryComm
         _inventoryRepository = inventoryRepository;
     }
 
-    public async Task<Result> Handle(
+    public async Task<Result> Handle( //! NOT COMPLETE -- PAY ATTENTION.
         UpdateInventoryCommand request,
         CancellationToken cancellationToken)
     {
@@ -32,9 +32,28 @@ public class UpdateInventoryCommandHandler : IRequestHandler<UpdateInventoryComm
 
             var productId = ProductId.Create(request.ProductId);
 
-            inventory.ProductId = productId;
-            inventory.StockQuantity = request.StockQuantity;
-            inventory.ReservedQuantity = request.ReservedQuantity;
+            if (request.StockQuantity < 0)
+            {
+                return Result.Failure(
+                    new Error("Inventory.InvalidStockQuantity", "Stock quantity cannot be negative"));
+            }
+
+            if (request.ReservedQuantity < 0)
+            {
+                return Result.Failure(
+                    new Error("Inventory.InvalidReservedQuantity", "Reserved quantity cannot be negative"));
+            }
+
+            // if (request.StockQuantity > 0 && request.ReservedQuantity > 0)
+            // {
+            //     inventory.AdjustStock(request.StockQuantity - inventory.StockQuantity);
+            //     // Note: ReservedQuantity adjustment logic can be added here if needed
+            //     inventory.ReserveStock();
+            // }
+
+            // inventory.ProductId = productId;
+            // inventory.StockQuantity = request.StockQuantity;
+            // inventory.ReservedQuantity = request.ReservedQuantity;
 
             await _inventoryRepository.UpdateAsync(inventory);
 

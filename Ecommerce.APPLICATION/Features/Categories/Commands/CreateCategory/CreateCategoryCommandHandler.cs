@@ -26,17 +26,14 @@ public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryComman
     {
         try
         {
-            var categoryId = Guid.NewGuid();
-
-            var category = new Category(
+            var category = Category.Create(
                 request.CategoryName,
                 request.CategoryDescription,
-                categoryId,
                 request.ActiveStatus);
 
             await _categoryRepository.CreateAsync(category);
 
-            return Result.Success(categoryId);
+            return Result.Success(category.Id.Id);
         }
         catch (Exception ex)
         {

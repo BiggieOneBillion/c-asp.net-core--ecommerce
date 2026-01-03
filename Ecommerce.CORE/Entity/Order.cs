@@ -44,14 +44,14 @@ public class Order : AggregateRoot<OrderId>
         
         // Raise domain event
         var itemsData = items.Select(i => new OrderItemData(
-            i.ProductId.Value(), // Using Value() method from ProductId
+            i.ProductId.Id, // Using Value() method from ProductId
             i.Quantity,
             i.PricePerUnitAtPurchaseTime
         )).ToList();
         
         order.RaiseDomainEvent(new OrderCreatedDomainEvent(
-            order.Id.Value(), // Using Value() method from OrderId
-            order.UserId.Value(), // Using Value() method from UserId
+            order.Id.Id, // Using Value() method from OrderId
+            order.UserId.Id, // Using Value() method from UserId
             order.TotalAmount,
             itemsData
         ));

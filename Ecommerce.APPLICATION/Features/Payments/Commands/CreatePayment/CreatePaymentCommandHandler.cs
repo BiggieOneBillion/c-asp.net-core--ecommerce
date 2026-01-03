@@ -24,7 +24,7 @@ public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand,
             var paymentId = Guid.NewGuid();
             var orderId = OrderId.Create(request.OrderId);
 
-            Payment payment = new(
+            Payment payment = Payment.Create(
                 paymentType:request.PaymentType,
                 amount:request.Amount,  
                 orderId:orderId);

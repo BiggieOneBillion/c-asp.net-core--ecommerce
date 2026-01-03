@@ -1,27 +1,33 @@
 using System;
+using Ecommerce.CORE.Common;
 using Ecommerce.CORE.Enums;
 using Ecommerce.CORE.ValueObjects;
 
 namespace Ecommerce.CORE.Entity;
 
-public class Payment
+public class Payment : AggregateRoot<PaymentId>
 {
-   public  PaymentId PaymentId { get; set; }
+    public PaymentType PaymentType { get; private set; }
+    public decimal Amount { get; private set; }
+    public DateTime PaymentDate { get; private set; }
+    public OrderId OrderId { get; private set; }
 
-   public PaymentType PaymentType { get; set;}
+    // Private constructor for EF Core
+    private Payment() { }
 
-   public  decimal Amount { get; set; }
-
-    public DateTime PaymentDate { get; set; } = DateTime.Now;
-
-    public  OrderId OrderId { get; set; }
-
-    public Payment(PaymentType paymentType, decimal amount, OrderId orderId)
+    // Factory method
+    public static Payment Create(PaymentType paymentType, decimal amount, OrderId orderId)
     {
-        PaymentId = PaymentId.Create(Guid.NewGuid());
-        PaymentType = paymentType;
-        Amount = amount;
-        OrderId = orderId;
-        PaymentDate = DateTime.UtcNow;
+        if (amount <= 0)
+            throw new DomainException("Payment amount must be greater than zero");
+
+        return new Payment
+        {
+            Id = PaymentId.Create(Guid.NewGuid()),
+            PaymentType = paymentType,
+            Amount = amount,
+            OrderId = orderId,
+            PaymentDate = DateTime.UtcNow
+        };
     }
 }

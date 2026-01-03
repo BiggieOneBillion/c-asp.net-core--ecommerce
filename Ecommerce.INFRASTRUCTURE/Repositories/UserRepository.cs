@@ -1,33 +1,44 @@
 using System;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
+using Ecommerce.INFRASTRUCTURE.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.INFRASTRUCTURE.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    public Task CreateAsync(Users entity)
+    private readonly ApplicationDbContext _context;
+
+    public UserRepository(ApplicationDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
     }
 
-    public Task DeleteAsync(Users entity)
+    public async Task CreateAsync(Users entity)
     {
-        throw new NotImplementedException();
+        await _context.Users.AddAsync(entity);
     }
 
-    public Task<Users?> GetByIdAsync(Guid id)
+    public async Task DeleteAsync(Users entity)
     {
-        throw new NotImplementedException();
+        _context.Users.Remove(entity);
+        await Task.CompletedTask;
     }
 
-    public Task<Users?> GetUserByEmailAsync(string email)
+    public async Task<Users?> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return await _context.Users.FirstOrDefaultAsync(u => u.Id.Id == id);
     }
 
-    public Task UpdateAsync(Users entity)
+    public async Task<Users?> GetUserByEmailAsync(string email)
     {
-        throw new NotImplementedException();
+        return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+    }
+
+    public async Task UpdateAsync(Users entity)
+    {
+        _context.Users.Update(entity);
+        await Task.CompletedTask;
     }
 }

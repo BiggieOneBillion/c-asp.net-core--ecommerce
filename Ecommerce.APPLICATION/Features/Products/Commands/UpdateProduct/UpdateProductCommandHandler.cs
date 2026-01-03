@@ -35,7 +35,7 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
             product.Name = request.Name;
             product.Description = request.Description;
             product.CategoryId = categoryId;
-            product.CurrentPrice = request.CurrentPrice;
+           
 
             await _productRepository.UpdateAsync(product);
 

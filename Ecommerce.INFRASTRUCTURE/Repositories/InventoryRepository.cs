@@ -1,33 +1,44 @@
 using System;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
+using Ecommerce.INFRASTRUCTURE.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.INFRASTRUCTURE.Repositories;
 
 public class InventoryRepository : IInventoryRepository
 {
-    public Task CreateAsync(Inventory entity)
+    private readonly ApplicationDbContext _context;
+
+    public InventoryRepository(ApplicationDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
     }
 
-    public Task DeleteAsync(Inventory entity)
+    public async Task CreateAsync(Inventory entity)
     {
-        throw new NotImplementedException();
+        await _context.Inventories.AddAsync(entity);
     }
 
-    public Task<Inventory?> GetByIdAsync(Guid id)
+    public async Task DeleteAsync(Inventory entity)
     {
-        throw new NotImplementedException();
+        _context.Inventories.Remove(entity);
+        await Task.CompletedTask;
     }
 
-    public Task<Inventory> GetByProductIdAsync(Guid productId)
+    public async Task<Inventory?> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return await _context.Inventories.FirstOrDefaultAsync(i => i.Id.Id == id);
     }
 
-    public Task UpdateAsync(Inventory entity)
+    public async Task<Inventory> GetByProductIdAsync(Guid productId)
     {
-        throw new NotImplementedException();
+        return await _context.Inventories.FirstOrDefaultAsync(i => i.ProductId.Id == productId) ?? null!;
+    }
+
+    public async Task UpdateAsync(Inventory entity)
+    {
+        _context.Inventories.Update(entity);
+        await Task.CompletedTask;
     }
 }

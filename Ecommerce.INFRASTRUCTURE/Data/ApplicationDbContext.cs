@@ -41,7 +41,7 @@ public class ApplicationDbContext : DbContext
     {
         // 1. Collect domain events from aggregate roots
         var domainEvents = ChangeTracker
-            .Entries<CORE.Common.AggregateRoot<object>>()
+            .Entries<CORE.Common.IAggregateRoot>()
             .Where(e => e.Entity.DomainEvents.Any())
             .SelectMany(e => e.Entity.DomainEvents)
             .ToList();
@@ -61,7 +61,7 @@ public class ApplicationDbContext : DbContext
         }
 
         // 3. Clear domain events after capturing
-        foreach (var entry in ChangeTracker.Entries<CORE.Common.AggregateRoot<object>>())
+        foreach (var entry in ChangeTracker.Entries<CORE.Common.IAggregateRoot>())
         {
             entry.Entity.ClearDomainEvents();
         }

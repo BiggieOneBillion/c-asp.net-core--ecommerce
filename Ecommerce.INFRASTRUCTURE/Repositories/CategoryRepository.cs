@@ -2,6 +2,7 @@ using System;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.INFRASTRUCTURE.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.INFRASTRUCTURE.Repositories;
 
@@ -14,29 +15,31 @@ public class CategoryRepository : ICategoryRepository
     {
         _context = context;
     }
-    async public Task CreateAsync(Category entity)
+
+    public async Task CreateAsync(Category entity)
     {
         await _context.Categories.AddAsync(entity);
-
     }
 
-    public Task DeleteAsync(Category entity)
+    public async Task DeleteAsync(Category entity)
     {
-        throw new NotImplementedException();
+        _context.Categories.Remove(entity);
+        await Task.CompletedTask;
     }
 
-    public Task<List<Category>> GetAllAsync()
+    public async Task<List<Category>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return await _context.Categories.ToListAsync();
     }
 
-    public Task<Category?> GetByIdAsync(Guid id)
+    public async Task<Category?> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return await _context.Categories.FirstOrDefaultAsync(c => c.Id.Id == id);
     }
 
-    public Task UpdateAsync(Category entity)
+    public async Task UpdateAsync(Category entity)
     {
-        throw new NotImplementedException();
+        _context.Categories.Update(entity);
+        await Task.CompletedTask;
     }
 }

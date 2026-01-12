@@ -1,7 +1,9 @@
 using Ecommerce.APPLICATION;
 using Ecommerce.INFRASTRUCTURE;
 using Ecommerce.INFRASTRUCTURE.BackgroundJobs;
+using Ecommerce.INFRASTRUCTURE.Data;
 using Hangfire;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddControllers();
+// builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 
 // APPLICATION Layer - Registers:
 // - MediatR (CQRS Commands & Queries)
@@ -53,6 +60,11 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddSwaggerGen(c =>
+{
+    c.CustomSchemaIds(type => type.FullName);
+});
+
 var app = builder.Build();
 
 
@@ -91,6 +103,23 @@ using (var scope = app.Services.CreateScope())
         job => job.Execute(),
         Cron.Minutely);
 }
+
+app.MapGet("/", () => "Ecommerce Backend is running. Visit /swagger for documentation.");
+  
+// if (app.Environment.IsDevelopment())
+// {
+//     using var scope = app.Services.CreateScope();
+//     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+//     try
+//     {
+//         await dbContext.Database.MigrateAsync();
+        
+//     }
+//     catch (Exception ex)
+//     {
+//         Console.WriteLine( "Database migration failed - ensure SQL Server is running");
+//     }
+// }
 
 app.Logger.LogInformation("Starting Ecommerce API...");
 app.Logger.LogInformation("CQRS Architecture: MediatR + FluentValidation + AutoMapper");

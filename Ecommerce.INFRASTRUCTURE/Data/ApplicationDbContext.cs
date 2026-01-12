@@ -50,7 +50,8 @@ public class ApplicationDbContext : DbContext
         var outboxMessages = domainEvents.Select(domainEvent => new OutboxMessage
         {
             Id = Guid.NewGuid(),
-            Type = domainEvent.GetType().AssemblyQualifiedName!,
+            // Type = domainEvent.GetType().AssemblyQualifiedName!,
+            Type = domainEvent.EventType().ToString().ToLowerInvariant(),
             Content = System.Text.Json.JsonSerializer.Serialize(domainEvent, domainEvent.GetType()),
             OccurredOn = domainEvent.OccurredOn
         }).ToList();

@@ -12,12 +12,16 @@ public class ProductPriceChangedDomainEventHandler : INotificationHandler<Produc
     private readonly IProductPriceHistoryRepository _priceHistoryRepository;
     private readonly ILogger<ProductPriceChangedDomainEventHandler> _logger;
 
+    private readonly IUnitOfWork _unitOfWork;
+
     public ProductPriceChangedDomainEventHandler(
         IProductPriceHistoryRepository priceHistoryRepository,
-        ILogger<ProductPriceChangedDomainEventHandler> logger)
+        ILogger<ProductPriceChangedDomainEventHandler> logger,
+        IUnitOfWork unitOfWork)
     {
         _priceHistoryRepository = priceHistoryRepository;
         _logger = logger;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task Handle(ProductPriceChangedDomainEvent notification, CancellationToken cancellationToken)
@@ -36,6 +40,8 @@ public class ProductPriceChangedDomainEventHandler : INotificationHandler<Produc
         );
 
         await _priceHistoryRepository.CreateAsync(historyRecord);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         
         // Note: The PriceHistory record will be persisted by the outbox processor 
         // when it calls SaveChangesAsync after publishing the event, 

@@ -72,7 +72,7 @@ public class ProcessOutboxMessagesJob
 
     private IDomainEvent DeserializeDomainEvent(OutboxMessage message)
     {
-        var type = Type.GetType(message.Type);
+        var type = DomainEventTypeResolver.Resolve(message.Type);
 
         if (type == null)
             throw new InvalidOperationException($"Type {message.Type} not found");
@@ -83,5 +83,6 @@ public class ProcessOutboxMessagesJob
             throw new InvalidOperationException($"Failed to deserialize {message.Type}");
 
         return (IDomainEvent)domainEvent;
+
     }
 }

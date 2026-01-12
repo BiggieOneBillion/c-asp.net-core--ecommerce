@@ -12,4 +12,9 @@ public sealed class OrderConfirmedDomainEvent : DomainEvent
         OrderId = orderId;
         UserId = userId;
     }
+
+     public override string EventType()
+    {
+        return DomainEventTypes.OrderConfirmed;
+    }
 }

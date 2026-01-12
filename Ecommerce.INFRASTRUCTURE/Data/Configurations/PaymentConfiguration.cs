@@ -26,7 +26,7 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
 
             builder.Property(x => x.Amount).HasColumnType("decimal(18,2)");
 
-            builder.Property(x => x.PaymentDate).HasColumnType("datetime2");
+            builder.Property(x => x.PaymentDate);
 
             builder.Property(x => x.OrderId)
                 .HasConversion(

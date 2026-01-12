@@ -34,7 +34,7 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
 
             builder.Property(x => x.OldPrice).HasColumnType("decimal(18,2)");
 
-            builder.Property(x => x.EffectiveDate).HasColumnType("datetime2");
+            builder.Property(x => x.EffectiveDate);
 
             // Relationships
             builder.HasOne<Product>()

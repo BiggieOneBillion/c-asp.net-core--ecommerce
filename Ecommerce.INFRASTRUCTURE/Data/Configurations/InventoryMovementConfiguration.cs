@@ -27,7 +27,7 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
 
             builder.Property(x => x.QuantityChanged).HasConversion<int>().IsRequired();
 
-            builder.Property(x => x.Timestamp).HasColumnType("datetime2").IsRequired();
+            builder.Property(x => x.Timestamp).HasColumnType("timestamp").IsRequired();
 
             builder.Property(x => x.Reason).HasMaxLength(250).IsRequired();
 

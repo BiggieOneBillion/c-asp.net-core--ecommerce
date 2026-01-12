@@ -10,13 +10,17 @@ namespace Ecommerce.APPLICATION.Features.Categories.Commands.CreateCategory;
 public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, Result<Guid>>
 {
     private readonly ICategoryRepository _categoryRepository;
+
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
     public CreateCategoryCommandHandler(
         ICategoryRepository categoryRepository,
+        IUnitOfWork unitOfWork,
         IMapper mapper)
     {
         _categoryRepository = categoryRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
@@ -32,6 +36,8 @@ public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryComman
                 request.ActiveStatus);
 
             await _categoryRepository.CreateAsync(category);
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return Result.Success(category.Id.Id);
         }

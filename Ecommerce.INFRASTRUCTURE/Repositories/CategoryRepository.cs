@@ -1,6 +1,7 @@
 using System;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
+using Ecommerce.CORE.ValueObjects;
 using Ecommerce.INFRASTRUCTURE.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,7 +35,10 @@ public class CategoryRepository : ICategoryRepository
 
     public async Task<Category?> GetByIdAsync(Guid id)
     {
-        return await _context.Categories.FirstOrDefaultAsync(c => c.Id.Id == id);
+        // return await _context.Categories.FirstOrDefaultAsync(c => c.Id.Id == id);
+       
+        return await _context.Categories.FirstOrDefaultAsync(c => c.Id == CategoryId.Create(id)); //! QUICK FIX 
+        // TODO: REVIEW LATER AND FIX PROPERLY
     }
 
     public async Task UpdateAsync(Category entity)

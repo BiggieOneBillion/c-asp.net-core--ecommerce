@@ -8,6 +8,11 @@ public sealed class OrderCreatedDomainEvent : DomainEvent
     public Guid UserId { get; }
     public decimal TotalAmount { get; }
     public List<OrderItemData> Items { get; }
+
+     public override string EventType()
+    {
+        return DomainEventTypes.OrderCreated;
+    }
     
     public OrderCreatedDomainEvent(
         Guid orderId, 

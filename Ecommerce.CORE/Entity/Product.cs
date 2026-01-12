@@ -23,7 +23,7 @@ public class Product : AggregateRoot<ProductId>
         if (price <= 0)
             throw new DomainException("Product price must be greater than zero");
         
-        return new Product
+        Product product =  new Product
         {
             Id = ProductId.Create(Guid.NewGuid()),
             Name = name,
@@ -31,6 +31,13 @@ public class Product : AggregateRoot<ProductId>
             CategoryId = categoryId,
             CurrentPrice = price
         };
+
+        product.RaiseDomainEvent(new ProductCreatedDomainEvent(
+            Guid.Parse(product.Id.Value()), 
+            0 // Initial stock quantity is 0
+        ));
+
+        return product;
     }
     
     public void UpdatePrice(decimal newPrice)

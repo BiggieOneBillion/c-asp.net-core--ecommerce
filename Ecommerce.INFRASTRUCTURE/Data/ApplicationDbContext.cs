@@ -15,6 +15,7 @@ public class ApplicationDbContext : DbContext
     }
     
     public DbSet<Users> Users { get; set; } = null!;
+    public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
     public DbSet<Product> Products { get; set; } = null!;
     public DbSet<Category> Categories { get; set; } = null!;
     public DbSet<Inventory> Inventories { get; set; } = null!;

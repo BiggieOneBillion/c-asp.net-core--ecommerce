@@ -1,6 +1,7 @@
 using Ecommerce.APPLICATION.Common.Interfaces;
-using Ecommerce.APPLICATION.DTOs.Auth;
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.DTOs.Auth;
+// using Ecommerce.APPLICATION.Common.Models;
 using Ecommerce.CORE.Interfaces;
 using MediatR;
 
@@ -9,13 +10,13 @@ namespace Ecommerce.APPLICATION.Features.Auth.Commands.Login;
 public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<AuthResponse>>
 {
     private readonly IUserRepository _userRepository;
-    private readonly IPasswordHasher _passwordHasher;
+    private readonly IPasswordHashers _passwordHasher;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IUnitOfWork _unitOfWork;
 
     public LoginCommandHandler(
         IUserRepository userRepository,
-        IPasswordHasher passwordHasher,
+        IPasswordHashers passwordHasher,
         IJwtTokenGenerator jwtTokenGenerator,
         IUnitOfWork unitOfWork)
     {
@@ -33,13 +34,15 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<AuthResp
         var user = await _userRepository.GetUserByEmailAsync(request.Email);
         if (user == null)
         {
-            return Result<AuthResponse>.Failure("Invalid credentials.");
+            return Result.Failure<AuthResponse>(
+                new Error("401", "Invalid credentials."));
         }
 
         // 2. Check for account lockout
         if (user.IsLockedOut)
         {
-            return Result<AuthResponse>.Failure($"Account is locked. Please try again after {user.LockoutEnd}.");
+            return Result.Failure<AuthResponse>(
+                new Error("403", $"Account is locked. Please try again after {user.LockoutEnd}."));
         }
 
         // 3. Verify password
@@ -51,13 +54,15 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<AuthResp
                 user.LockoutEnd = DateTime.UtcNow.AddMinutes(15);
             }
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result<AuthResponse>.Failure("Invalid credentials.");
+            return Result.Failure<AuthResponse>(
+                new Error("401", "Invalid credentials."));
         }
 
         // 4. Check if email is verified
         if (!user.IsEmailVerified)
         {
-            return Result<AuthResponse>.Failure("Please verify your email before logging in.");
+            return Result.Failure<AuthResponse>(
+                new Error("403", "Please verify your email before logging in."));
         }
 
         // 5. Reset failed access count on successful login

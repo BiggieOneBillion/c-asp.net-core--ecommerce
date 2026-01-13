@@ -8,6 +8,7 @@ using Ecommerce.APPLICATION.Features.Auth.Commands.ResetPassword;
 using Ecommerce.APPLICATION.Features.Auth.Commands.VerifyEmail;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Ecommerce.APPLICATION.Features.Auth.Commands.ResendVerification;
 
 namespace Ecommerce.API.Controllers;
 

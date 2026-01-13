@@ -43,7 +43,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
         CORE.Entity.Users user = new(
                     name: request.Name,
                     email: request.Email,
-                    password: hashedPassword,
+                    passwordHash: hashedPassword,
                     userId: userId
                 );
 

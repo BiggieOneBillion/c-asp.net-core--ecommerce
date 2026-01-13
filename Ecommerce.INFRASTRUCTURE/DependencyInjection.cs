@@ -41,7 +41,7 @@ public static  class DependencyInjection
 
         // Services
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
-        services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+        services.AddScoped<IPasswordHashers, BCryptPasswordHasher>();
         services.AddScoped<IEmailService, MockEmailService>();
         services.AddScoped<ITokenBlacklistService, TokenBlacklistService>();
 

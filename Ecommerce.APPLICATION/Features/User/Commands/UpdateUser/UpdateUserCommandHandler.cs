@@ -51,7 +51,7 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Resul
             // Update password only if provided
             if (!string.IsNullOrWhiteSpace(request.Password))
             {
-                user.Password = _passwordService.HashPassword(request.Password);
+                user.PasswordHash = _passwordService.HashPassword(request.Password);
             }
 
             await _userRepository.UpdateAsync(user);

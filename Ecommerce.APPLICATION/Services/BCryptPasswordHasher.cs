@@ -1,6 +1,6 @@
-using Ecommerce.APPLICATION.Common.Interfaces;
 
-namespace Ecommerce.INFRASTRUCTURE.Services;
+using BCrypt.Net;
+using Ecommerce.APPLICATION.Common.Interfaces;
 
 public class BCryptPasswordHasher : IPasswordHashers
 {

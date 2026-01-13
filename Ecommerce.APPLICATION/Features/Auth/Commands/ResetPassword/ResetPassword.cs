@@ -10,12 +10,12 @@ public record ResetPasswordCommand(string Token, string NewPassword) : IRequest<
 public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand, Result<Unit>>
 {
     private readonly IUserRepository _userRepository;
-    private readonly IPasswordHasher _passwordHasher;
+    private readonly IPasswordHashers _passwordHasher;
     private readonly IUnitOfWork _unitOfWork;
 
     public ResetPasswordCommandHandler(
         IUserRepository userRepository,
-        IPasswordHasher passwordHasher,
+        IPasswordHashers passwordHasher,
         IUnitOfWork unitOfWork)
     {
         _userRepository = userRepository;
@@ -28,7 +28,7 @@ public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand,
         var user = await _userRepository.GetUserByPasswordResetTokenAsync(command.Token);
         if (user == null || user.ResetTokenExpires < DateTime.UtcNow)
         {
-            return Result<Unit>.Failure("Invalid or expired reset token.");
+            return Result.Failure<Unit>(new Error("400", "Invalid or expired reset token."));
         }
 
         var passwordHash = _passwordHasher.HashPassword(command.NewPassword);

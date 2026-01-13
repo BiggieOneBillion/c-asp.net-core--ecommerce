@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "LVkUh7boS5Y=",
+  "dgSpecHash": "A1QJdRT5fjQ=",
   "success": true,
   "projectFilePath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.INFRASTRUCTURE/Ecommerce.INFRASTRUCTURE.csproj",
   "expectedPackageFiles": [
     "/Users/chukwuchinwendu/.nuget/packages/azure.core/1.38.0/azure.core.1.38.0.nupkg.sha512",
     "/Users/chukwuchinwendu/.nuget/packages/azure.identity/1.11.4/azure.identity.1.11.4.nupkg.sha512",
+    "/Users/chukwuchinwendu/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
     "/Users/chukwuchinwendu/.nuget/packages/dapper/2.0.123/dapper.2.0.123.nupkg.sha512",
     "/Users/chukwuchinwendu/.nuget/packages/hangfire.aspnetcore/1.8.22/hangfire.aspnetcore.1.8.22.nupkg.sha512",
     "/Users/chukwuchinwendu/.nuget/packages/hangfire.core/1.8.22/hangfire.core.1.8.22.nupkg.sha512",

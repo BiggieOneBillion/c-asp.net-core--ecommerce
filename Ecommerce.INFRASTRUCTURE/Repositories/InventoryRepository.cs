@@ -33,7 +33,7 @@ public class InventoryRepository : IInventoryRepository
 
     public async Task<Inventory> GetByProductIdAsync(Guid productId)
     {
-        return await _context.Inventories.FirstOrDefaultAsync(i => i.ProductId.Id == productId) ?? null!;
+        return await _context.Inventories.FirstOrDefaultAsync(i => i.ProductId == ProductId.Create(productId)) ?? null!;
     }
 
     public async Task UpdateAsync(Inventory entity)

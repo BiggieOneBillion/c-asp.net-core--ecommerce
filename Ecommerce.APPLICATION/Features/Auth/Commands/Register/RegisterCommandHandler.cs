@@ -10,14 +10,14 @@ namespace Ecommerce.APPLICATION.Features.Auth.Commands.Register;
 public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<AuthResponse>>
 {
     private readonly IUserRepository _userRepository;
-    private readonly IPasswordHasher _passwordHasher;
+    private readonly IPasswordHashers _passwordHasher;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IEmailService _emailService;
 
     public RegisterCommandHandler(
         IUserRepository userRepository,
-        IPasswordHasher passwordHasher,
+        IPasswordHashers passwordHasher,
         IJwtTokenGenerator jwtTokenGenerator,
         IUnitOfWork unitOfWork,
         IEmailService emailService)
@@ -37,14 +37,14 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<Au
         var existingUser = await _userRepository.GetUserByEmailAsync(request.Email);
         if (existingUser != null)
         {
-            return Result<AuthResponse>.Failure("User with this email already exists.");
+            return Result.Failure<AuthResponse>(new Error("409", "User with this email already exists."));
         }
 
         // 2. Hash password
         var passwordHash = _passwordHasher.HashPassword(request.Password);
 
         // 3. Create user
-        var user = new Users(
+        var user = new CORE.Entity.Users(
             request.Name,
             request.Email,
             passwordHash,
@@ -54,7 +54,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<Au
         user.EmailVerificationToken = Guid.NewGuid().ToString("N");
 
         // 5. Save user
-        await _userRepository.AddAsync(user);
+        await _userRepository.CreateAsync(user);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         // 6. Send verification email

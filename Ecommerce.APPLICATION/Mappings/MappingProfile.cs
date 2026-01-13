@@ -48,5 +48,10 @@ public class MappingProfile : Profile
         CreateMap<InventoryMovement, InventoryMovementResponseDTO>()
             .ForCtorParam("InventoryMovementId", opt => opt.MapFrom(src => src.Id.Id))
             .ForCtorParam("ProductId", opt => opt.MapFrom(src => src.ProductId.Id));
+
+        // Inventory Mappings
+        CreateMap<Inventory, InventoryResponseDTO>()
+            .ForCtorParam("InventoryId", opt => opt.MapFrom(src => src.Id.Id))
+            .ForCtorParam("ProductId", opt => opt.MapFrom(src => src.ProductId.Id));
     }
 }

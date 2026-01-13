@@ -34,7 +34,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
         var refreshToken = await _refreshTokenRepository.GetByTokenAsync(token);
         if (refreshToken == null)
         {
-            return Result<AuthResponse>.Failure("Invalid refresh token.");
+            return Result.Failure<AuthResponse>(new Error("400", "Invalid refresh token."));
         }
 
         // 2. Token Reuse Detection (Family Tracking)
@@ -44,20 +44,20 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
             // Revoke all tokens in this family
             await _refreshTokenRepository.RevokeFamilyAsync(refreshToken.FamilyId, command.IpAddress);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result<AuthResponse>.Failure("Invalid refresh token. Security compromise detected. All sessions revoked.");
+            return Result.Failure<AuthResponse>(new Error("400", "Invalid refresh token. Security compromise detected. All sessions revoked."));
         }
 
         // 3. Check expiration
         if (refreshToken.IsExpired)
         {
-            return Result<AuthResponse>.Failure("Refresh token expired.");
+            return Result.Failure<AuthResponse>(new Error("400", "Refresh token expired."));
         }
 
         // 4. Get User
-        var user = await _userRepository.GetByIdAsync(refreshToken.UserId);
+        var user = await _userRepository.GetByIdAsync(refreshToken.UserId.Id);
         if (user == null)
         {
-            return Result<AuthResponse>.Failure("User not found.");
+            return Result.Failure<AuthResponse>(new Error("404", "User not found."));
         }
 
         // 5. Rotate Token: Invalidate old token

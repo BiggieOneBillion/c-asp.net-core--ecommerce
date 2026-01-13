@@ -32,6 +32,9 @@
               },
               "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj": {
                 "projectPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj"
+              },
+              "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.INFRASTRUCTURE/Ecommerce.INFRASTRUCTURE.csproj": {
+                "projectPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.INFRASTRUCTURE/Ecommerce.INFRASTRUCTURE.csproj"
               }
             }
           }
@@ -127,9 +130,6 @@
             "projectReferences": {
               "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj": {
                 "projectPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj"
-              },
-              "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.INFRASTRUCTURE/Ecommerce.INFRASTRUCTURE.csproj": {
-                "projectPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.INFRASTRUCTURE/Ecommerce.INFRASTRUCTURE.csproj"
               }
             }
           }
@@ -292,6 +292,9 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
+              "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.APPLICATION/Ecommerce.APPLICATION.csproj": {
+                "projectPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.APPLICATION/Ecommerce.APPLICATION.csproj"
+              },
               "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj": {
                 "projectPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj"
               }

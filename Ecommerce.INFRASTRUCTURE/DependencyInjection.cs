@@ -3,6 +3,8 @@ using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.INFRASTRUCTURE.Data;
 using Ecommerce.INFRASTRUCTURE.Repositories;
+using Ecommerce.INFRASTRUCTURE.Services;
+using Ecommerce.APPLICATION.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

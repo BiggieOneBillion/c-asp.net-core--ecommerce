@@ -41,4 +41,19 @@ public class UserRepository : IUserRepository
         _context.Users.Update(entity);
         await Task.CompletedTask;
     }
+
+    public async Task AddAsync(Users entity)
+    {
+        await CreateAsync(entity);
+    }
+
+    public async Task<Users?> GetUserByVerificationTokenAsync(string token)
+    {
+        return await _context.Users.FirstOrDefaultAsync(u => u.EmailVerificationToken == token);
+    }
+
+    public async Task<Users?> GetUserByPasswordResetTokenAsync(string token)
+    {
+        return await _context.Users.FirstOrDefaultAsync(u => u.PasswordResetToken == token);
+    }
 }

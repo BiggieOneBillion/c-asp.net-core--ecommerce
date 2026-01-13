@@ -1,0 +1,92 @@
+using Ecommerce.APPLICATION.Common.Interfaces;
+using Ecommerce.APPLICATION.DTOs.Auth;
+using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.CORE.Entity;
+using Ecommerce.CORE.Interfaces;
+using MediatR;
+
+namespace Ecommerce.APPLICATION.Features.Auth.Commands.Register;
+
+public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<AuthResponse>>
+{
+    private readonly IUserRepository _userRepository;
+    private readonly IPasswordHasher _passwordHasher;
+    private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IEmailService _emailService;
+
+    public RegisterCommandHandler(
+        IUserRepository userRepository,
+        IPasswordHasher passwordHasher,
+        IJwtTokenGenerator jwtTokenGenerator,
+        IUnitOfWork unitOfWork,
+        IEmailService emailService)
+    {
+        _userRepository = userRepository;
+        _passwordHasher = passwordHasher;
+        _jwtTokenGenerator = jwtTokenGenerator;
+        _unitOfWork = unitOfWork;
+        _emailService = emailService;
+    }
+
+    public async Task<Result<AuthResponse>> Handle(RegisterCommand command, CancellationToken cancellationToken)
+    {
+        var request = command.Request;
+
+        // 1. Check if user already exists
+        var existingUser = await _userRepository.GetUserByEmailAsync(request.Email);
+        if (existingUser != null)
+        {
+            return Result<AuthResponse>.Failure("User with this email already exists.");
+        }
+
+        // 2. Hash password
+        var passwordHash = _passwordHasher.HashPassword(request.Password);
+
+        // 3. Create user
+        var user = new Users(
+            request.Name,
+            request.Email,
+            passwordHash,
+            Guid.NewGuid());
+
+        // 4. Generate email verification token
+        user.EmailVerificationToken = Guid.NewGuid().ToString("N");
+
+        // 5. Save user
+        await _userRepository.AddAsync(user);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        // 6. Send verification email
+        await _emailService.SendVerificationEmailAsync(user.Email, user.Name, user.EmailVerificationToken);
+
+        // 7. Generate tokens
+        var accessToken = _jwtTokenGenerator.GenerateAccessToken(user);
+        var refreshToken = _jwtTokenGenerator.GenerateRefreshToken();
+
+        // 8. Track refresh token (Family tracking)
+        var refreshTokenEntity = new RefreshToken
+        {
+            Id = Guid.NewGuid(),
+            Token = refreshToken,
+            FamilyId = Guid.NewGuid().ToString("N"),
+            Expires = DateTime.UtcNow.AddDays(7),
+            UserId = user.Id,
+            CreatedByIp = "Unknown" // Should be passed from controller or context
+        };
+
+        // Note: RefreshTokenRepository implementation needed to save this
+        // For now, assume it's part of the Unit of Work or User repository aggregation
+        user.RefreshTokens.Add(refreshTokenEntity);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        var response = new AuthResponse(
+            accessToken,
+            refreshToken,
+            user.Name,
+            user.Email,
+            user.Role.ToString());
+
+        return Result<AuthResponse>.Success(response);
+    }
+}

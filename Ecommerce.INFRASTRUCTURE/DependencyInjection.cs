@@ -29,6 +29,7 @@ public static  class DependencyInjection
          // Repositories
        
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IInventoryRepository, InventoryRepository>();
@@ -37,6 +38,13 @@ public static  class DependencyInjection
         services.AddScoped<IOrderItemsRepository, OrderItemsRepository>();
         services.AddScoped<IProductPriceHistoryRepository, ProductPriceHistoryRepository>();
         services.AddScoped<IInventoryMovementRepository, InventoryMovementRepository>();
+
+        // Services
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+        services.AddScoped<IEmailService, MockEmailService>();
+        services.AddScoped<ITokenBlacklistService, TokenBlacklistService>();
+
         // Unit of Work
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

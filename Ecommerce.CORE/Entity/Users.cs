@@ -1,26 +1,58 @@
 using System;
 using Ecommerce.CORE.ValueObjects;
+using Ecommerce.CORE.Enums;
+using System.Collections.Generic;
 
 namespace Ecommerce.CORE.Entity;
 
 public class Users
 {
-  public  string Name { get; set; } = string.Empty;
+    public UserId Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string PasswordHash { get; set; } = string.Empty;
+    public UserRole Role { get; set; } = UserRole.Customer;
 
-  public string Email { get; set; } = string.Empty;
+    // Email Verification
+    public bool IsEmailVerified { get; set; }
+    public string? EmailVerificationToken { get; set; }
 
-  public string Password { get; set; } = string.Empty;
+    // Password Reset
+    public string? PasswordResetToken { get; set; }
+    public DateTime? ResetTokenExpires { get; set; }
 
-   public UserId Id { get; set; }
+    // Account Lockout
+    public DateTime? LockoutEnd { get; set; }
+    public int AccessFailedCount { get; set; }
 
-   private Users() { }
+    // Navigation properties
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
-   public Users(string name, string email, string password, Guid userId)
+    private Users() { }
+
+    public Users(string name, string email, string passwordHash, Guid userId, UserRole role = UserRole.Customer)
     {
         Name = name;
         Email = email;
-        Password = password; //! remember to harsh password before storing in real application
+        PasswordHash = passwordHash;
         Id = UserId.Create(userId);
+        Role = role;
+        IsEmailVerified = false;
+        AccessFailedCount = 0;
     }
 
+    public void VerifyEmail()
+    {
+        IsEmailVerified = true;
+        EmailVerificationToken = null;
+    }
+
+    public void UpdatePassword(string newPasswordHash)
+    {
+        PasswordHash = newPasswordHash;
+        PasswordResetToken = null;
+        ResetTokenExpires = null;
+    }
+
+    public bool IsLockedOut => LockoutEnd.HasValue && LockoutEnd.Value > DateTime.UtcNow;
 }

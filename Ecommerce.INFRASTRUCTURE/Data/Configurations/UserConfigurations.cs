@@ -30,35 +30,36 @@ public class UserConfiguration : IEntityTypeConfiguration<Users>
         builder.HasIndex(u => u.Email)
             .IsUnique();
         
+        builder.Property(u => u.PasswordHash)
+            .IsRequired();
+
+        builder.Property(u => u.Role)
+            .HasConversion<string>()
+            .IsRequired();
+
+        // Email Verification
+        builder.Property(u => u.IsEmailVerified)
+            .HasDefaultValue(false);
+
+        builder.Property(u => u.EmailVerificationToken)
+            .HasMaxLength(255);
+
+        // Password Reset
+        builder.Property(u => u.PasswordResetToken)
+            .HasMaxLength(255);
+
+        builder.Property(u => u.ResetTokenExpires);
+
+        // Account Lockout
+        builder.Property(u => u.LockoutEnd);
+        
+        builder.Property(u => u.AccessFailedCount)
+            .HasDefaultValue(0);
+
         // Relationships
-        // builder.HasMany(u => u.OwnedWorkspaces)
-        //     .WithOne(w => w.Owner)
-        //     .HasForeignKey(w => w.OwnerId)
-        //     .OnDelete(DeleteBehavior.Restrict);
-        
-        // builder.HasMany(u => u.WorkspaceMemberships)
-        //     .WithOne(wm => wm.User)
-        //     .HasForeignKey(wm => wm.UserId)
-        //     .OnDelete(DeleteBehavior.Cascade);
-        
-        // builder.HasMany(u => u.LedProjects)
-        //     .WithOne(p => p.TeamLead)
-        //     .HasForeignKey(p => p.TeamLeadId)
-        //     .OnDelete(DeleteBehavior.Restrict);
-        
-        // builder.HasMany(u => u.ProjectMemberships)
-        //     .WithOne(pm => pm.User)
-        //     .HasForeignKey(pm => pm.UserId)
-        //     .OnDelete(DeleteBehavior.Cascade);
-        
-        // builder.HasMany(u => u.AssignedTasks)
-        //     .WithOne(t => t.Assignee)
-        //     .HasForeignKey(t => t.AssigneeId)
-        //     .OnDelete(DeleteBehavior.SetNull);
-        
-        // builder.HasMany(u => u.Comments)
-        //     .WithOne(c => c.User)
-        //     .HasForeignKey(c => c.UserId)
-        //     .OnDelete(DeleteBehavior.Cascade);
+        builder.HasMany(u => u.RefreshTokens)
+            .WithOne(rt => rt.User)
+            .HasForeignKey(rt => rt.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

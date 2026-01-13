@@ -89,6 +89,9 @@ app.UseHttpsRedirection();
 // Enable CORS
 app.UseCors("AllowFrontend");
 
+app.UseMiddleware<Ecommerce.API.Middleware.SecurityHeadersMiddleware>();
+app.UseMiddleware<Ecommerce.API.Middleware.RateLimitingMiddleware>();
+
 app.MapControllers();
 
 // Hangfire Dashboard

@@ -4,6 +4,7 @@ using Ecommerce.INFRASTRUCTURE.BackgroundJobs;
 using Ecommerce.INFRASTRUCTURE.Data;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 

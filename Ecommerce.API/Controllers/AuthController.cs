@@ -77,7 +77,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
         await _mediator.Send(new ForgotPasswordCommand(request.Email));
-        return Ok(new { message = "If the email exists, a reset link has been sent." });
+        return Ok(new { message = "A reset link has been sent to the email." });
     }
 
     [HttpPost("reset-password")]

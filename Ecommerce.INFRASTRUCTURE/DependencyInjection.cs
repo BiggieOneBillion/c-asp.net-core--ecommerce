@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.INFRASTRUCTURE.Data;
@@ -42,6 +43,9 @@ public static  class DependencyInjection
         services.AddScoped<IInventoryMovementRepository, InventoryMovementRepository>();
 
         // Services
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IPermissionProvider, PermissionProvider>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IPasswordHashers, BCryptPasswordHasher>();
         services.AddScoped<IEmailService, MockEmailService>();
@@ -61,6 +65,30 @@ public static  class DependencyInjection
             .UsePostgreSqlStorage(configureOptions.GetConnectionString("DefaultConnection")));
 
         services.AddHangfireServer();
+
+        // Authentication & Authorization
+        var key = Encoding.ASCII.GetBytes(configureOptions["Jwt:Secret"] ?? "your-very-strong-secret-key-that-is-at-least-256-bits");
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = configureOptions["Jwt:Issuer"],
+                ValidAudience = configureOptions["Jwt:Audience"],
+                IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(key)
+            };
+        });
+
+        services.AddAuthorization();
         
         return services;
     }

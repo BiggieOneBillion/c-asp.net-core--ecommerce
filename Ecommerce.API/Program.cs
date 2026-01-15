@@ -89,6 +89,9 @@ app.UseHttpsRedirection();
 // Enable CORS
 app.UseCors("AllowFrontend");
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseMiddleware<Ecommerce.API.Middleware.SecurityHeadersMiddleware>();
 app.UseMiddleware<Ecommerce.API.Middleware.RateLimitingMiddleware>();
 

@@ -6,22 +6,27 @@ using Ecommerce.APPLICATION.Common.Interfaces;
 using Ecommerce.CORE.Entity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Ecommerce.CORE.Interfaces;
 
 namespace Ecommerce.INFRASTRUCTURE.Services;
 
 public class JwtTokenGenerator : IJwtTokenGenerator
 {
     private readonly IConfiguration _configuration;
+    private readonly IPermissionProvider _permissionProvider;
 
-    public JwtTokenGenerator(IConfiguration configuration)
+    public JwtTokenGenerator(IConfiguration configuration, IPermissionProvider permissionProvider)
     {
         _configuration = configuration;
+        _permissionProvider = permissionProvider;
     }
 
     public string GenerateAccessToken(Users user)
     {
         var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Secret"] ?? "your-very-strong-secret-key-that-is-at-least-256-bits");
         var tokenHandler = new JwtSecurityTokenHandler();
+
+        var permissions = _permissionProvider.GetPermissionsForRole(user.Role);
         
         var claims = new List<Claim>
         {
@@ -30,6 +35,12 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             new(ClaimTypes.Role, user.Role.ToString()),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
+
+        // Add permissions as custom claims
+        foreach (var permission in permissions)
+        {
+            claims.Add(new Claim("permission", permission));
+        }
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

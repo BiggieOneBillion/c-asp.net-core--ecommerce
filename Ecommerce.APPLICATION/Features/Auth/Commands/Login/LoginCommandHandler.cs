@@ -12,17 +12,20 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<AuthResp
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHashers _passwordHasher;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public LoginCommandHandler(
         IUserRepository userRepository,
         IPasswordHashers passwordHasher,
         IJwtTokenGenerator jwtTokenGenerator,
+        IRefreshTokenRepository refreshTokenRepository,
         IUnitOfWork unitOfWork)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
         _jwtTokenGenerator = jwtTokenGenerator;
+        _refreshTokenRepository = refreshTokenRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -53,7 +56,9 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<AuthResp
             {
                 user.LockoutEnd = DateTime.UtcNow.AddMinutes(15);
             }
+
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
             return Result.Failure<AuthResponse>(
                 new Error("401", "Invalid credentials."));
         }
@@ -84,7 +89,9 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<AuthResp
             CreatedByIp = command.IpAddress
         };
 
-        user.RefreshTokens.Add(refreshTokenEntity);
+        // Note: Using repository instead of user.RefreshTokens.Add to avoid EF Core tracking issues
+        await _refreshTokenRepository.CreateAsync(refreshTokenEntity);   
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         var response = new AuthResponse(

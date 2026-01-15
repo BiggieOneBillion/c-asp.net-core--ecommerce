@@ -9,7 +9,7 @@ public class Order : AggregateRoot<OrderId>
 {
     private readonly List<OrderItems> _orderItems = new();
     
-    public UserId UserId { get; private set; } = null!;
+    public UserId UserId { get; private set; } = default;
     public PaymentId? PaymentId { get; private set; }
     public OrderStatus Status { get; private set; }
     public decimal TotalAmount { get; private set; }

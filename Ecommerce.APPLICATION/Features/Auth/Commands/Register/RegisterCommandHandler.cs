@@ -12,6 +12,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<Au
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHashers _passwordHasher;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IEmailService _emailService;
 
@@ -19,12 +20,14 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<Au
         IUserRepository userRepository,
         IPasswordHashers passwordHasher,
         IJwtTokenGenerator jwtTokenGenerator,
+        IRefreshTokenRepository refreshTokenRepository,
         IUnitOfWork unitOfWork,
         IEmailService emailService)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
         _jwtTokenGenerator = jwtTokenGenerator;
+        _refreshTokenRepository = refreshTokenRepository;
         _unitOfWork = unitOfWork;
         _emailService = emailService;
     }
@@ -53,18 +56,14 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<Au
         // 4. Generate email verification token
         user.EmailVerificationToken = Guid.NewGuid().ToString("N");
 
-        // 5. Save user
+        // 5. Add user to repository (not saved yet)
         await _userRepository.CreateAsync(user);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        // 6. Send verification email
-        await _emailService.SendVerificationEmailAsync(user.Email, user.Name, user.EmailVerificationToken);
-
-        // 7. Generate tokens
+        // 6. Generate tokens
         var accessToken = _jwtTokenGenerator.GenerateAccessToken(user);
         var refreshToken = _jwtTokenGenerator.GenerateRefreshToken();
 
-        // 8. Track refresh token (Family tracking)
+        // 7. Track refresh token (Family tracking)
         var refreshTokenEntity = new RefreshToken
         {
             Id = Guid.NewGuid(),
@@ -75,17 +74,21 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<Au
             CreatedByIp = "Unknown" // Should be passed from controller or context
         };
 
-        // Note: RefreshTokenRepository implementation needed to save this
-        // For now, assume it's part of the Unit of Work or User repository aggregation
-        user.RefreshTokens.Add(refreshTokenEntity);
+        // 8. Track refresh token in repository
+        await _refreshTokenRepository.CreateAsync(refreshTokenEntity);
+
+        // 9. Save user with refresh token in a single transaction
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+        // 10. Send verification email (after successful save)
+        await _emailService.SendVerificationEmailAsync(user.Email, user.Name, user.EmailVerificationToken);
+
         var response = new AuthResponse(
-            accessToken,
-            refreshToken,
-            user.Name,
-            user.Email,
-            user.Role.ToString());
+            AccessToken:accessToken,
+            RefreshToken:refreshToken,
+            Name:user.Name,
+            Email:user.Email,
+            Role:user.Role.ToString());
 
         return Result<AuthResponse>.Success(response);
     }

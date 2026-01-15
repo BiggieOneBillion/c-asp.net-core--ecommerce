@@ -77,18 +77,20 @@ public class RefreshTokenRepository : IRefreshTokenRepository
         }
     }
 
-    public Task CreateAsync(RefreshToken entity)
+    public async Task CreateAsync(RefreshToken entity)
     {
-        throw new NotImplementedException();
+        await AddAsync(entity);
     }
 
-    public Task UpdateAsync(RefreshToken entity)
+    public async Task UpdateAsync(RefreshToken entity)
     {
-        throw new NotImplementedException();
+        Update(entity);
+        await Task.CompletedTask;
     }
 
-    public Task DeleteAsync(RefreshToken entity)
+    public async Task DeleteAsync(RefreshToken entity)
     {
-        throw new NotImplementedException();
+        Delete(entity);
+        await Task.CompletedTask;
     }
 }

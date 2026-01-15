@@ -52,6 +52,8 @@ public class InventoryMovementController : ControllerBase
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> CreateInventoryMovement([FromBody] CreateInventoryMovementCommand command)
     {
         var result = await _mediator.Send(command);

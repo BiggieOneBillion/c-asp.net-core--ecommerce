@@ -12,8 +12,12 @@ using Ecommerce.APPLICATION.Features.Auth.Commands.ResendVerification;
 
 namespace Ecommerce.API.Controllers;
 
+/// <summary>
+/// Controller for authentication and authorization operations
+/// </summary>
 [ApiController]
 [Route("auth")]
+[Produces("application/json")]
 public class AuthController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -23,7 +27,14 @@ public class AuthController : ControllerBase
         _mediator = mediator;
     }
 
+    /// <summary>
+    /// Register a new user
+    /// </summary>
+    /// <param name="request">Registration details</param>
+    /// <returns>User details and tokens</returns>
     [HttpPost("register")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         var result = await _mediator.Send(new RegisterCommand(request));
@@ -33,7 +44,14 @@ public class AuthController : ControllerBase
         return Ok(result.Value);
     }
 
+    /// <summary>
+    /// Login and receive tokens
+    /// </summary>
+    /// <param name="request">Login credentials</param>
+    /// <returns>User details and tokens</returns>
     [HttpPost("login")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
@@ -44,7 +62,14 @@ public class AuthController : ControllerBase
         return Ok(result.Value);
     }
 
+    /// <summary>
+    /// Refresh the access token using a refresh token
+    /// </summary>
+    /// <returns>New user details and tokens</returns>
     [HttpPost("refresh")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Refresh()
     {
         var refreshToken = Request.Cookies["refreshToken"];
@@ -58,7 +83,12 @@ public class AuthController : ControllerBase
         return Ok(result.Value);
     }
 
+    /// <summary>
+    /// Logout and invalidate tokens
+    /// </summary>
+    /// <returns>Success message</returns>
     [HttpPost("logout")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Logout()
     {
         var refreshToken = Request.Cookies["refreshToken"];
@@ -73,14 +103,27 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Logged out successfully" });
     }
 
+    /// <summary>
+    /// Initiate forgot password process
+    /// </summary>
+    /// <param name="request">Email address</param>
+    /// <returns>Success message</returns>
     [HttpPost("forgot-password")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
         await _mediator.Send(new ForgotPasswordCommand(request.Email));
         return Ok(new { message = "A reset link has been sent to the email." });
     }
 
+    /// <summary>
+    /// Reset password using token
+    /// </summary>
+    /// <param name="request">Token and new password</param>
+    /// <returns>Success message</returns>
     [HttpPost("reset-password")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
         var result = await _mediator.Send(new ResetPasswordCommand(request.Token, request.NewPassword));
@@ -88,7 +131,14 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Password reset successfully." });
     }
 
+    /// <summary>
+    /// Verify user email
+    /// </summary>
+    /// <param name="request">Verification token</param>
+    /// <returns>Success message</returns>
     [HttpPost("verify-email")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
     {
         var result = await _mediator.Send(new VerifyEmailCommand(request.Token));
@@ -96,7 +146,13 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Email verified successfully." });
     }
 
+    /// <summary>
+    /// Resend email verification link
+    /// </summary>
+    /// <param name="request">Email address</param>
+    /// <returns>Success message</returns>
     [HttpPost("resend-verification")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> ResendVerification([FromBody] ForgotPasswordRequest request)
     {
         await _mediator.Send(new ResendVerificationCommand(request.Email));

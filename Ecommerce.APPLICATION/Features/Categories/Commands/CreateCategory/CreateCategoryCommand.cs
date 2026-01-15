@@ -1,7 +1,10 @@
+using Ecommerce.CORE.Constants;
+using Ecommerce.APPLICATION.Common.Security;
 using Ecommerce.APPLICATION.Common.Interfaces;
 
 namespace Ecommerce.APPLICATION.Features.Categories.Commands.CreateCategory;
 
+[HasPermission(Permissions.Categories.Create)]
 public record CreateCategoryCommand(
     string CategoryName,
     string CategoryDescription,

@@ -50,19 +50,36 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
     {
-        Title = "Project Management API",
+        Title = "Ecommerce API",
         Version = "v1",
-        Description = "RESTful API for Project Management Platform with CQRS architecture",
+        Description = "RESTful API for Modern Ecommerce Platform with CQRS architecture",
         Contact = new Microsoft.OpenApi.Models.OpenApiContact
         {
-            Name = "Project Management Team"
+            Name = "Ecommerce Support",
+            Email = "support@ecommerce.com"
         }
     });
-});
 
-builder.Services.AddSwaggerGen(c =>
-{
-    c.CustomSchemaIds(type => type.FullName);
+    // Add JWT Authentication to Swagger
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\""
+    });
+
+    // Add the custom filter to document permissions
+    options.OperationFilter<Ecommerce.API.Filters.SwaggerAuthorizeCheckOperationFilter>();
+
+    // Use XML comments
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
+
+    options.CustomSchemaIds(type => type.FullName);
 });
 
 var app = builder.Build();

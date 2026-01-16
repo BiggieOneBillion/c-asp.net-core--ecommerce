@@ -34,6 +34,11 @@ namespace Ecommerce.INFRASTRUCTURE.Repositories
             return await _context.ProductPriceHistories.FirstOrDefaultAsync(p => p.Id.Id == id);
         }
 
+        public async Task<IEnumerable<ProductPriceHistory>> GetAllAsync()
+        {
+            return await _context.ProductPriceHistories.ToListAsync();
+        }
+
         public async Task<IEnumerable<ProductPriceHistory>> GetByProductIdAsync(Guid productId)
         {
             return await _context.ProductPriceHistories

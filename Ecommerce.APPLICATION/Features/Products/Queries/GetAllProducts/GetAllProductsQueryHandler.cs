@@ -51,7 +51,7 @@ public class GetAllProductsQueryHandler
                     (Guid.Parse(product.Id.Value()), Guid.Parse(product.CategoryId.Value()), product.CurrentPrice, 1)
                 };
 
-                decimal discountAmount = await _discountService.CalculateDiscountAsync(null, product.CurrentPrice, discountItems);
+                var (discountAmount, _) = await _discountService.CalculateDiscountAsync(null, product.CurrentPrice, discountItems);
 
                 if (discountAmount > 0)
                 {

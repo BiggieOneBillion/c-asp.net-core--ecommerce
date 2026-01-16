@@ -31,6 +31,11 @@ public class PaymentRepository : IPaymentRepository
         return await _context.Payments.FirstOrDefaultAsync(p => p.Id.Id == id);
     }
 
+    public async Task<IEnumerable<Payment>> GetAllAsync()
+    {
+        return await _context.Payments.ToListAsync();
+    }
+
     public async Task<IEnumerable<Payment>> GetByOrderIdAsync(Guid orderId)
     {
         return await _context.Payments

@@ -24,6 +24,11 @@ public class DiscountRepository : IDiscountRepository
         return await _context.Discounts.FindAsync(id);
     }
 
+    public async Task<IEnumerable<Discount>> GetAllAsync()
+    {
+        return await _context.Discounts.ToListAsync();
+    }
+
     public async Task UpdateAsync(Discount entity)
     {
         _context.Discounts.Update(entity);

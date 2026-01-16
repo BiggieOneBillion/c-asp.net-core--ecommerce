@@ -1,6 +1,8 @@
 using Ecommerce.APPLICATION.Features.Discounts.Commands.CreateDiscount;
 using Ecommerce.APPLICATION.Features.Discounts.Commands.DeleteDiscount;
 using Ecommerce.APPLICATION.Features.Discounts.Commands.UpdateDiscount;
+using Ecommerce.APPLICATION.Features.Discounts.Queries.GetDiscountAnalytics;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +18,23 @@ public class DiscountsController : ControllerBase
     public DiscountsController(IMediator mediator)
     {
         _mediator = mediator;
+    }
+
+    /// <summary>
+    /// Get discount analytics and performance
+    /// </summary>
+    [HttpGet("analytics")]
+    [ProducesResponseType(typeof(DiscountAnalyticsResponseDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetAnalytics()
+    {
+        var result = await _mediator.Send(new GetDiscountAnalyticsQuery());
+
+        if (result.IsFailure)
+            return BadRequest(new { error = result.Error.Message });
+
+        return Ok(result.Value);
     }
 
     /// <summary>

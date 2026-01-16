@@ -1,3 +1,4 @@
+using System.Linq;
 using AutoMapper;
 using Ecommerce.APPLICATION.Common.Models;
 using Ecommerce.APPLICATION.ResponseDTOs;
@@ -35,7 +36,7 @@ public class GetAllCategoriesQueryHandler
             }
 
             // Calculate pagination
-            var totalCount = categories.Count;
+            var totalCount = categories.Count();
             var items = categories
                 .Skip((request.PageNumber - 1) * request.PageSize)
                 .Take(request.PageSize)

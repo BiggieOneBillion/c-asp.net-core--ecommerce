@@ -11,6 +11,7 @@ public class Order : AggregateRoot<OrderId>
     
     public UserId UserId { get; private set; } = default;
     public PaymentId? PaymentId { get; private set; }
+    public Guid? AppliedDiscountId { get; private set; }
     public OrderStatus Status { get; private set; }
     public decimal TotalAmount { get; private set; }
     public decimal DiscountAmount { get; private set; }
@@ -22,7 +23,7 @@ public class Order : AggregateRoot<OrderId>
     private Order() { }
     
     // Factory method
-    public static Order Create(UserId userId, PaymentId paymentId, List<OrderItems> items, decimal discountAmount = 0)
+    public static Order Create(UserId userId, PaymentId paymentId, List<OrderItems> items, decimal discountAmount = 0, Guid? appliedDiscountId = null)
     {
         if (items == null || !items.Any())
             throw new DomainException("Order must have at least one item");
@@ -32,6 +33,7 @@ public class Order : AggregateRoot<OrderId>
             Id = OrderId.Create(Guid.NewGuid()),
             UserId = userId,
             PaymentId = paymentId,
+            AppliedDiscountId = appliedDiscountId,
             Status = OrderStatus.Pending,
             DiscountAmount = discountAmount,
             CreatedAt = DateTime.UtcNow

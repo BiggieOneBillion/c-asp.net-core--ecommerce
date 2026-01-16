@@ -13,17 +13,20 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
     private readonly IUnitOfWork _unitOfWork;
     private readonly IOrderRepository _orderRepository;
     private readonly IProductRepository _productRepository;
+    private readonly IDiscountRepository _discountRepository;
     private readonly IDiscountService _discountService;
 
     public CreateOrderCommandHandler(
         IUnitOfWork unitOfWork, 
         IOrderRepository orderRepository,
         IProductRepository productRepository,
+        IDiscountRepository discountRepository,
         IDiscountService discountService)
     {
         _unitOfWork = unitOfWork;
         _orderRepository = orderRepository;
         _productRepository = productRepository;
+        _discountRepository = discountRepository;
         _discountService = discountService;
     }
 
@@ -50,11 +53,22 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
             )).ToList();
 
             decimal subTotal = request.Items.Sum(i => i.PricePerUnit * i.Quantity);
-            decimal discountAmount = await _discountService.CalculateDiscountAsync(
+            var (discountAmount, appliedDiscountId) = await _discountService.CalculateDiscountAsync(
                 request.UserId, 
                 subTotal, 
                 discountItems, 
                 request.CouponCode);
+
+            // Increment UsageCount if a discount was applied
+            if (appliedDiscountId.HasValue)
+            {
+                var discount = await _discountRepository.GetByIdAsync(appliedDiscountId.Value);
+                if (discount != null)
+                {
+                    discount.UsageCount++;
+                    await _discountRepository.UpdateAsync(discount);
+                }
+            }
 
             var items = request.Items.Select(i => new CORE.Entity.OrderItems(
                 OrderId.Create(Guid.Empty), // Will be set by factory
@@ -63,7 +77,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
                 i.PricePerUnit
             )).ToList();
 
-            var order = Order.Create(userId, paymentId, items, discountAmount);
+            var order = Order.Create(userId, paymentId, items, discountAmount, appliedDiscountId);
 
             await _orderRepository.CreateAsync(order);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

@@ -14,7 +14,7 @@ public class DiscountService : IDiscountService
         _discountRepository = discountRepository;
     }
 
-    public async Task<decimal> CalculateDiscountAsync(
+    public async Task<(decimal DiscountAmount, Guid? AppliedDiscountId)> CalculateDiscountAsync(
         Guid? userId, 
         decimal orderTotal, 
         List<(Guid ProductId, Guid CategoryId, decimal Price, int Quantity)> items, 
@@ -22,16 +22,18 @@ public class DiscountService : IDiscountService
     {
         var activeDiscounts = (await _discountRepository.GetActiveDiscountsAsync()).ToList();
         decimal totalDiscount = 0;
+        Guid? appliedDiscountId = null;
 
-        // 1. Handle Coupon Code (Global or specific)
+        // 1. Handle Coupon Code (Global or specific) - Coupons usually take priority or are specific
         if (!string.IsNullOrEmpty(couponCode))
         {
             var coupon = await _discountRepository.GetByCodeAsync(couponCode);
             if (coupon != null && IsEligible(coupon, userId, orderTotal))
             {
                 totalDiscount += ApplyDiscount(coupon, orderTotal, items);
-                // If a coupon is applied, we might decide it's exclusive or not. 
-                // For now, let's assume it can stack with automatic product/category discounts.
+                appliedDiscountId = coupon.Id;
+                // If a coupon is applied, we'll return it as the primary applied discount
+                return (totalDiscount, appliedDiscountId);
             }
         }
 
@@ -42,11 +44,18 @@ public class DiscountService : IDiscountService
         {
             if (IsEligible(discount, userId, orderTotal))
             {
-                totalDiscount += ApplyDiscount(discount, orderTotal, items);
+                var discountValue = ApplyDiscount(discount, orderTotal, items);
+                if (discountValue > 0)
+                {
+                    totalDiscount += discountValue;
+                    // For automatic ones, we might track the last one or the one with most value. 
+                    // Let's track the first one that provided value for simplicity in analytics for now.
+                    appliedDiscountId ??= discount.Id;
+                }
             }
         }
 
-        return totalDiscount;
+        return (totalDiscount, appliedDiscountId);
     }
 
     private bool IsEligible(Discount discount, Guid? userId, decimal orderTotal)

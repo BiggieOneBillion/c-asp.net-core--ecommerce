@@ -34,6 +34,11 @@ namespace Ecommerce.INFRASTRUCTURE.Repositories
             return await _context.InventoryMovements.FirstOrDefaultAsync(i => i.Id.Id == id);
         }
 
+        public async Task<IEnumerable<InventoryMovement>> GetAllAsync()
+        {
+            return await _context.InventoryMovements.ToListAsync();
+        }
+
         public async Task<IEnumerable<InventoryMovement>> GetByProductIdAsync(Guid productId)
         {
             return await _context.InventoryMovements

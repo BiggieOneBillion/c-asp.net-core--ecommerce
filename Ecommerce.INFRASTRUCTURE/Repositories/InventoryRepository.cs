@@ -31,6 +31,11 @@ public class InventoryRepository : IInventoryRepository
         return await _context.Inventories.FirstOrDefaultAsync(i => i.Id.Id == id);
     }
 
+    public async Task<IEnumerable<Inventory>> GetAllAsync()
+    {
+        return await _context.Inventories.ToListAsync();
+    }
+
     public async Task<Inventory> GetByProductIdAsync(Guid productId)
     {
         return await _context.Inventories.FirstOrDefaultAsync(i => i.ProductId == ProductId.Create(productId)) ?? null!;

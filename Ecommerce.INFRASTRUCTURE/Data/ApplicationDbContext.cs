@@ -25,6 +25,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<ProductPriceHistory> ProductPriceHistories {get; set;} = null!;
     public DbSet<InventoryMovement> InventoryMovements { get; set; } = null!;
     public DbSet<OutboxMessage> OutboxMessages { get; set; } = null!;
+    public DbSet<Discount> Discounts { get; set; } = null!;
 
     // do not forget to enable audit trail
     // public DbSet<Invitation> Invitations { get; set; } = null!;

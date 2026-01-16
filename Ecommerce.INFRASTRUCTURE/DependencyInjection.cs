@@ -41,6 +41,7 @@ public static  class DependencyInjection
         services.AddScoped<IOrderItemsRepository, OrderItemsRepository>();
         services.AddScoped<IProductPriceHistoryRepository, ProductPriceHistoryRepository>();
         services.AddScoped<IInventoryMovementRepository, InventoryMovementRepository>();
+        services.AddScoped<IDiscountRepository, DiscountRepository>();
 
         // Services
         services.AddHttpContextAccessor();

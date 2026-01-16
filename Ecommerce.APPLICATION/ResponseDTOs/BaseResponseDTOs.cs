@@ -13,7 +13,9 @@ public record ProductResponseDTO(
     string Name,
     string Description,
     Guid CategoryId,
-    decimal CurrentPrice);
+    decimal CurrentPrice,
+    decimal? DiscountedPrice = null,
+    decimal? DiscountPercentage = null);
 
 public record UserResponseDTO(
     Guid UserId,

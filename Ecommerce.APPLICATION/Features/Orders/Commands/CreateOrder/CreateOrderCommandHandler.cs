@@ -1,4 +1,5 @@
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.Common.Interfaces;
 using Ecommerce.CORE.Common;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
@@ -11,11 +12,19 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IOrderRepository _orderRepository;
+    private readonly IProductRepository _productRepository;
+    private readonly IDiscountService _discountService;
 
-    public CreateOrderCommandHandler(IUnitOfWork unitOfWork, IOrderRepository orderRepository)
+    public CreateOrderCommandHandler(
+        IUnitOfWork unitOfWork, 
+        IOrderRepository orderRepository,
+        IProductRepository productRepository,
+        IDiscountService discountService)
     {
         _unitOfWork = unitOfWork;
         _orderRepository = orderRepository;
+        _productRepository = productRepository;
+        _discountService = discountService;
     }
 
     public async Task<Result<Guid>> Handle(
@@ -27,6 +36,26 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
             var userId = UserId.Create(request.UserId);
             var paymentId = PaymentId.Create(request.PaymentId);
 
+            // Fetch products to get CategoryIds for discount calculation
+            var productIds = request.Items.Select(i => i.ProductId).ToList();
+            var products = await _productRepository.GetAllAsync(); // In a real app, use GetByIdsAsync
+            var productsMap = products.Where(p => productIds.Contains(p.Id.Id))
+                                      .ToDictionary(p => p.Id.Id, p => p.CategoryId.Id);
+
+            var discountItems = request.Items.Select(i => (
+                i.ProductId,
+                productsMap.GetValueOrDefault(i.ProductId),
+                i.PricePerUnit,
+                i.Quantity
+            )).ToList();
+
+            decimal subTotal = request.Items.Sum(i => i.PricePerUnit * i.Quantity);
+            decimal discountAmount = await _discountService.CalculateDiscountAsync(
+                request.UserId, 
+                subTotal, 
+                discountItems, 
+                request.CouponCode);
+
             var items = request.Items.Select(i => new CORE.Entity.OrderItems(
                 OrderId.Create(Guid.Empty), // Will be set by factory
                 ProductId.Create(i.ProductId),
@@ -34,7 +63,7 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
                 i.PricePerUnit
             )).ToList();
 
-            var order = Order.Create(userId, paymentId, items);
+            var order = Order.Create(userId, paymentId, items, discountAmount);
 
             await _orderRepository.CreateAsync(order);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

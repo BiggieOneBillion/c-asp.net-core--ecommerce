@@ -3,7 +3,7 @@ using Ecommerce.CORE.Enums;
 
 namespace Ecommerce.CORE.Entity;
 
-public class Discount : BaseEntity
+public class Discount : AggregateRoot<Guid>
 {
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }

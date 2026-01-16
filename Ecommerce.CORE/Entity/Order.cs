@@ -13,6 +13,7 @@ public class Order : AggregateRoot<OrderId>
     public PaymentId? PaymentId { get; private set; }
     public OrderStatus Status { get; private set; }
     public decimal TotalAmount { get; private set; }
+    public decimal DiscountAmount { get; private set; }
     public DateTime CreatedAt { get; private set; }
     
     public IReadOnlyCollection<OrderItems> OrderItems => _orderItems.AsReadOnly();
@@ -21,7 +22,7 @@ public class Order : AggregateRoot<OrderId>
     private Order() { }
     
     // Factory method
-    public static Order Create(UserId userId, PaymentId paymentId, List<OrderItems> items)
+    public static Order Create(UserId userId, PaymentId paymentId, List<OrderItems> items, decimal discountAmount = 0)
     {
         if (items == null || !items.Any())
             throw new DomainException("Order must have at least one item");
@@ -32,6 +33,7 @@ public class Order : AggregateRoot<OrderId>
             UserId = userId,
             PaymentId = paymentId,
             Status = OrderStatus.Pending,
+            DiscountAmount = discountAmount,
             CreatedAt = DateTime.UtcNow
         };
         
@@ -81,6 +83,7 @@ public class Order : AggregateRoot<OrderId>
     
     private void CalculateTotalAmount()
     {
-        TotalAmount = _orderItems.Sum(i => i.PricePerUnitAtPurchaseTime * i.Quantity);
+        var subTotal = _orderItems.Sum(i => i.PricePerUnitAtPurchaseTime * i.Quantity);
+        TotalAmount = subTotal - DiscountAmount;
     }
 }

@@ -8,7 +8,8 @@ namespace Ecommerce.APPLICATION.Features.Orders.Commands.CreateOrder;
 public record CreateOrderCommand(
     Guid UserId,
     Guid PaymentId,
-    List<CreateOrderItemCommand> Items
+    List<CreateOrderItemCommand> Items,
+    string? CouponCode = null
 ) : ICommand<Guid>;
 
 public record CreateOrderItemCommand(

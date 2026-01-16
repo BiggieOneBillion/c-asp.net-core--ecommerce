@@ -10,6 +10,8 @@ public class SwaggerAuthorizeCheckOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
+        if (context.MethodInfo.DeclaringType == null) return;
+
         // Check if the endpoint itself has Authorize or HasPermission on the controller/action
         var hasAuthorize = context.MethodInfo.DeclaringType.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any() ||
                            context.MethodInfo.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any();

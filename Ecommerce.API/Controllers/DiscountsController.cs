@@ -1,7 +1,10 @@
 using Ecommerce.APPLICATION.Features.Discounts.Commands.CreateDiscount;
 using Ecommerce.APPLICATION.Features.Discounts.Commands.DeleteDiscount;
 using Ecommerce.APPLICATION.Features.Discounts.Commands.UpdateDiscount;
+using Ecommerce.APPLICATION.Features.Discounts.Queries.GetActiveDiscounts;
 using Ecommerce.APPLICATION.Features.Discounts.Queries.GetDiscountAnalytics;
+using Ecommerce.APPLICATION.Features.Discounts.Queries.GetDiscountById;
+using Ecommerce.APPLICATION.Features.Discounts.Queries.ValidateCoupon;
 using Ecommerce.APPLICATION.ResponseDTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +24,33 @@ public class DiscountsController : ControllerBase
     }
 
     /// <summary>
+    /// Get all active discounts
+    /// </summary>
+    [HttpGet]
+    [ProducesResponseType(typeof(List<DiscountResponseDTO>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetActive()
+    {
+        var result = await _mediator.Send(new GetActiveDiscountsQuery());
+        return Ok(result.Value);
+    }
+
+    /// <summary>
+    /// Get discount by ID
+    /// </summary>
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(DiscountResponseDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var result = await _mediator.Send(new GetDiscountByIdQuery(id));
+
+        if (result.IsFailure)
+            return NotFound(new { error = result.Error.Message });
+
+        return Ok(result.Value);
+    }
+
+    /// <summary>
     /// Get discount analytics and performance
     /// </summary>
     [HttpGet("analytics")]
@@ -34,6 +64,17 @@ public class DiscountsController : ControllerBase
         if (result.IsFailure)
             return BadRequest(new { error = result.Error.Message });
 
+        return Ok(result.Value);
+    }
+
+    /// <summary>
+    /// Validate a coupon code
+    /// </summary>
+    [HttpPost("validate")]
+    [ProducesResponseType(typeof(CouponValidationResultDTO), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ValidateCoupon([FromBody] ValidateCouponQuery query)
+    {
+        var result = await _mediator.Send(query);
         return Ok(result.Value);
     }
 

@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Discounts.Commands.UpdateDiscount;
 
-[HasPermission(Permissions.Users.View)] // Placeholder
+[HasPermission(Permissions.Discounts.Update)]
 public record UpdateDiscountCommand(
     Guid Id,
     string Name,

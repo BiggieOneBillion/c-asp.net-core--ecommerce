@@ -5,7 +5,7 @@ using Ecommerce.APPLICATION.Common.Interfaces;
 
 namespace Ecommerce.APPLICATION.Features.Discounts.Commands.CreateDiscount;
 
-[HasPermission(Permissions.Users.View)] // Assuming management requires high permission, using a placeholder for now
+[HasPermission(Permissions.Discounts.Create)]
 public record CreateDiscountCommand(
     string Name,
     string? Description,

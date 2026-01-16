@@ -6,5 +6,5 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Discounts.Queries.GetDiscountAnalytics;
 
-[HasPermission(Permissions.Users.View)] // Placeholder for high-level dashboard permission
+[HasPermission(Permissions.Discounts.Manage)]
 public record GetDiscountAnalyticsQuery() : IRequest<Ecommerce.APPLICATION.Common.Models.Result<DiscountAnalyticsResponseDTO>>;

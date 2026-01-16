@@ -5,5 +5,5 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Discounts.Commands.DeleteDiscount;
 
-[HasPermission(Permissions.Users.View)] // Placeholder
+[HasPermission(Permissions.Discounts.Delete)]
 public record DeleteDiscountCommand(Guid Id) : ICommand<Unit>;

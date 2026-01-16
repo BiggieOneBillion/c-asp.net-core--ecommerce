@@ -16,7 +16,8 @@ public class PermissionProvider : IPermissionProvider
             Permissions.Categories.View, Permissions.Categories.Create, Permissions.Categories.Update, Permissions.Categories.Delete,
             Permissions.Inventory.View, Permissions.Inventory.Manage,
             Permissions.Orders.ViewAll, Permissions.Orders.ViewOwn, Permissions.Orders.Create, Permissions.Orders.UpdateStatus, Permissions.Orders.Refund,
-            Permissions.Payments.ViewAll, Permissions.Payments.ViewOwn, Permissions.Payments.Process
+            Permissions.Payments.ViewAll, Permissions.Payments.ViewOwn, Permissions.Payments.Process,
+            Permissions.Discounts.View, Permissions.Discounts.Manage, Permissions.Discounts.Create, Permissions.Discounts.Update, Permissions.Discounts.Delete
         },
         [UserRole.Staff] = new HashSet<string>
         {
@@ -24,7 +25,8 @@ public class PermissionProvider : IPermissionProvider
             Permissions.Categories.View,
             Permissions.Inventory.View, Permissions.Inventory.Manage,
             Permissions.Orders.ViewAll, Permissions.Orders.ViewOwn, Permissions.Orders.UpdateStatus,
-            Permissions.Payments.ViewAll, Permissions.Payments.ViewOwn
+            Permissions.Payments.ViewAll, Permissions.Payments.ViewOwn,
+            Permissions.Discounts.View, Permissions.Discounts.Manage
         },
         [UserRole.Customer] = new HashSet<string>
         {

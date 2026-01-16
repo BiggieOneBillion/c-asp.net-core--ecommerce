@@ -47,4 +47,13 @@ public static class Permissions
         public const string ViewOwn = "Payments.ViewOwn";
         public const string Process = "Payments.Process";
     }
+
+    public static class Discounts
+    {
+        public const string View = "Discounts.View";
+        public const string Manage = "Discounts.Manage";
+        public const string Create = "Discounts.Create";
+        public const string Update = "Discounts.Update";
+        public const string Delete = "Discounts.Delete";
+    }
 }

@@ -33,6 +33,7 @@ public static class DependencyInjection
         // Register Authentication Services
        
         services.AddScoped<IPasswordService, PasswordService>();
+        services.AddScoped<Ecommerce.APPLICATION.Common.Interfaces.IDiscountService, DiscountService>();
         
         return services;
     }

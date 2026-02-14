@@ -28,6 +28,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<IEnumerable<Product>> GetAllAsync()
     {
+       
         return await _context.Products.ToListAsync();
     }
 
@@ -52,5 +53,12 @@ public class ProductRepository : IProductRepository
     {
         _context.Products.Update(entity);
         await Task.CompletedTask;
+    }
+
+    public async Task<List<Product>> GetByIdsAsync(IEnumerable<Guid> ids)
+    {
+        return await _context.Products
+            .Where(p => ids.ToList().Contains(p.Id.Id))
+            .ToListAsync();
     }
 }

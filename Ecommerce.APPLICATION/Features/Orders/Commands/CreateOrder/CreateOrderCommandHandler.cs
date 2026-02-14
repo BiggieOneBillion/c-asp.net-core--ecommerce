@@ -41,9 +41,11 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Res
 
             // Fetch products to get CategoryIds for discount calculation
             var productIds = request.Items.Select(i => i.ProductId).ToList();
-            var products = await _productRepository.GetAllAsync(); // In a real app, use GetByIdsAsync
-            var productsMap = products.Where(p => productIds.Contains(p.Id.Id))
-                                      .ToDictionary(p => p.Id.Id, p => p.CategoryId.Id);
+            // var products = await _productRepository.GetAllAsync(); // In a real app, use GetByIdsAsync
+            var products = await _productRepository.GetByIdsAsync(productIds);
+            // var productsMap = products.Where(p => productIds.Contains(p.Id.Id))
+            //                           .ToDictionary(p => p.Id.Id, p => p.CategoryId.Id);
+            var productsMap = products.ToDictionary(p => p.Id.Id, p => p.CategoryId.Id);
 
             var discountItems = request.Items.Select(i => (
                 i.ProductId,

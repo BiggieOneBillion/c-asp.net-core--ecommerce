@@ -1,4 +1,5 @@
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Discounts.Queries.ValidateCoupon;
@@ -8,7 +9,7 @@ namespace Ecommerce.APPLICATION.Features.Discounts.Queries.ValidateCoupon;
 /// </summary>
 /// <param name="Code">The unique coupon code to validate</param>
 /// <param name="OrderTotal">The current order subtotal to check against minimum requirements</param>
-public record ValidateCouponQuery(string Code, decimal OrderTotal) : IRequest<Result<CouponValidationResultDTO>>;
+public record ValidateCouponQuery(string Code, decimal OrderTotal) : IRequest<Result<GeneralResponse<CouponValidationResultDTO>>>;
 
 /// <summary>
 /// Result of a coupon validation attempt

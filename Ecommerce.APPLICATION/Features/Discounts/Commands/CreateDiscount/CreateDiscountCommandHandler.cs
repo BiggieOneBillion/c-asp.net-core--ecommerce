@@ -1,50 +1,51 @@
 using Ecommerce.APPLICATION.Common.Models;
-using Ecommerce.CORE.Common;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Discounts.Commands.CreateDiscount;
 
-public class CreateDiscountCommandHandler : IRequestHandler<CreateDiscountCommand, Result<Guid>>
+public class CreateDiscountCommandHandler : IRequestHandler<CreateDiscountCommand, Result<GeneralResponse<Guid>>>
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IDiscountRepository _discountRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateDiscountCommandHandler(IUnitOfWork unitOfWork, IDiscountRepository discountRepository)
+    public CreateDiscountCommandHandler(IDiscountRepository discountRepository, IUnitOfWork unitOfWork)
     {
-        _unitOfWork = unitOfWork;
         _discountRepository = discountRepository;
+        _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<Guid>> Handle(CreateDiscountCommand request, CancellationToken cancellationToken)
+    public async Task<Result<GeneralResponse<Guid>>> Handle(CreateDiscountCommand request, CancellationToken cancellationToken)
     {
-        try
+        if (!Enum.TryParse<CORE.Enums.DiscountType>(request.Type, true, out var type))
         {
-            var discount = new Discount
-            {
-                Name = request.Name,
-                Description = request.Description,
-                Code = request.Code,
-                Type = request.Type,
-                Value = request.Value,
-                Scope = request.Scope,
-                TargetId = request.TargetId,
-                StartDate = request.StartDate,
-                EndDate = request.EndDate,
-                MinimumOrderAmount = request.MinimumOrderAmount,
-                UsageLimit = request.UsageLimit,
-                IsActive = true
-            };
-
-            await _discountRepository.CreateAsync(discount);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            return Result.Success(discount.Id);
+            return Result.Failure<GeneralResponse<Guid>>(new Error("Discount.InvalidType", "Invalid discount type"));
         }
-        catch (Exception ex)
+
+        if (!Enum.TryParse<CORE.Enums.DiscountScope>(request.Scope, true, out var scope))
         {
-            return Result.Failure<Guid>(new Error("Discount.CreateFailed", $"Failed to create discount: {ex.Message}"));
+            return Result.Failure<GeneralResponse<Guid>>(new Error("Discount.InvalidScope", "Invalid discount scope"));
         }
+
+        var discount = Discount.Create(
+            name: request.Name,
+            description: request.Description,
+            code: request.CouponCode,
+            type: type,
+            value: request.Value,
+            scope: scope,
+            targetId: request.ApplicableProductIds?.FirstOrDefault() ?? request.ApplicableCategoryIds?.FirstOrDefault(),
+            startDate: request.StartDate,
+            endDate: request.EndDate,
+            minimumOrderAmount: request.MinimumOrderAmount,
+            usageLimit: request.UsageLimit
+        );
+
+        await _discountRepository.CreateAsync(discount);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Result<GeneralResponse<Guid>>.Success(GeneralResponse<Guid>.CreateSuccess(discount.Id, "Discount created successfully", 201));
     }
 }

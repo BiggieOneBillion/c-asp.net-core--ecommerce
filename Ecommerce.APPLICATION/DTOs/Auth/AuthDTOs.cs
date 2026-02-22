@@ -39,7 +39,7 @@ public record AuthResponse(
 
 public record RegisterationResponse(
     string Message
-)
+);
 
 /// <summary>
 /// Request model for refreshing an expired access token

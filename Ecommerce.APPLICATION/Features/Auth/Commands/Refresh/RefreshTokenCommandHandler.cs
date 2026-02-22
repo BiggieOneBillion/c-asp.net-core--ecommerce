@@ -1,13 +1,14 @@
 using Ecommerce.APPLICATION.Common.Interfaces;
-using Ecommerce.APPLICATION.DTOs.Auth;
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.DTOs.Auth;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Auth.Commands.Refresh;
 
-public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, Result<AuthResponse>>
+public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, Result<GeneralResponse<AuthResponse>>>
 {
     private readonly IUserRepository _userRepository;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
@@ -26,7 +27,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<AuthResponse>> Handle(RefreshTokenCommand command, CancellationToken cancellationToken)
+    public async Task<Result<GeneralResponse<AuthResponse>>> Handle(RefreshTokenCommand command, CancellationToken cancellationToken)
     {
         var token = command.Request.RefreshToken;
 
@@ -34,30 +35,28 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
         var refreshToken = await _refreshTokenRepository.GetByTokenAsync(token);
         if (refreshToken == null)
         {
-            return Result.Failure<AuthResponse>(new Error("400", "Invalid refresh token."));
+            return Result.Failure<GeneralResponse<AuthResponse>>(new Error("400", "Invalid refresh token."));
         }
 
         // 2. Token Reuse Detection (Family Tracking)
         if (refreshToken.IsRevoked || refreshToken.IsUsed)
         {
-            // Token family compromise detected! 
-            // Revoke all tokens in this family
             await _refreshTokenRepository.RevokeFamilyAsync(refreshToken.FamilyId, command.IpAddress);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result.Failure<AuthResponse>(new Error("400", "Invalid refresh token. Security compromise detected. All sessions revoked."));
+            return Result.Failure<GeneralResponse<AuthResponse>>(new Error("400", "Invalid refresh token. Security compromise detected. All sessions revoked."));
         }
 
         // 3. Check expiration
         if (refreshToken.IsExpired)
         {
-            return Result.Failure<AuthResponse>(new Error("400", "Refresh token expired."));
+            return Result.Failure<GeneralResponse<AuthResponse>>(new Error("400", "Refresh token expired."));
         }
 
         // 4. Get User
         var user = await _userRepository.GetByIdAsync(refreshToken.UserId.Id);
         if (user == null)
         {
-            return Result.Failure<AuthResponse>(new Error("404", "User not found."));
+            return Result.Failure<GeneralResponse<AuthResponse>>(new Error("404", "User not found."));
         }
 
         // 5. Rotate Token: Invalidate old token
@@ -92,6 +91,6 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
             user.Email,
             user.Role.ToString());
 
-        return Result<AuthResponse>.Success(response);
+        return Result<GeneralResponse<AuthResponse>>.Success(GeneralResponse<AuthResponse>.CreateSuccess(response, "Token refreshed successfully"));
     }
 }

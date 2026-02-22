@@ -1,11 +1,12 @@
 using Ecommerce.APPLICATION.Common.Interfaces;
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Interfaces;
 using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Auth.Commands.Logout;
 
-public class LogoutCommandHandler : IRequestHandler<LogoutCommand, Result<Unit>>
+public class LogoutCommandHandler : IRequestHandler<LogoutCommand, Result<GeneralResponse<Unit>>>
 {
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly ITokenBlacklistService _tokenBlacklistService;
@@ -21,7 +22,7 @@ public class LogoutCommandHandler : IRequestHandler<LogoutCommand, Result<Unit>>
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<Unit>> Handle(LogoutCommand command, CancellationToken cancellationToken)
+    public async Task<Result<GeneralResponse<Unit>>> Handle(LogoutCommand command, CancellationToken cancellationToken)
     {
         // 1. Revoke the refresh token
         var refreshToken = await _refreshTokenRepository.GetByTokenAsync(command.RefreshToken);
@@ -33,9 +34,8 @@ public class LogoutCommandHandler : IRequestHandler<LogoutCommand, Result<Unit>>
         }
 
         // 2. Blacklist the access token
-        // We'll use a fixed expiry (e.g. 15 mins) for the blacklist since access tokens expire in 15 mins
         await _tokenBlacklistService.BlacklistTokenAsync(command.AccessToken, TimeSpan.FromMinutes(15));
 
-        return Result<Unit>.Success(Unit.Value);
+        return Result<GeneralResponse<Unit>>.Success(GeneralResponse<Unit>.CreateSuccess(Unit.Value, "Logged out successfully"));
     }
 }

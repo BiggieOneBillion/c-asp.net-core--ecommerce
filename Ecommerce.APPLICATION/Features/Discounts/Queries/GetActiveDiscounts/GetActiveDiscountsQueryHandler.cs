@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Discounts.Queries.GetActiveDiscounts;
 
-public class GetActiveDiscountsQueryHandler : IRequestHandler<GetActiveDiscountsQuery, Result<List<DiscountResponseDTO>>>
+public class GetActiveDiscountsQueryHandler : IRequestHandler<GetActiveDiscountsQuery, Result<GeneralResponse<List<DiscountResponseDTO>>>>
 {
     private readonly IDiscountRepository _discountRepository;
     private readonly IMapper _mapper;
@@ -17,7 +17,7 @@ public class GetActiveDiscountsQueryHandler : IRequestHandler<GetActiveDiscounts
         _mapper = mapper;
     }
 
-    public async Task<Result<List<DiscountResponseDTO>>> Handle(GetActiveDiscountsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<GeneralResponse<List<DiscountResponseDTO>>>> Handle(GetActiveDiscountsQuery request, CancellationToken cancellationToken)
     {
         try
         {
@@ -25,14 +25,14 @@ public class GetActiveDiscountsQueryHandler : IRequestHandler<GetActiveDiscounts
 
             if (activeDiscounts == null)
             {
-                return Result.Failure<List<DiscountResponseDTO>>(new Error("Discount.QueryFailed", $"No active discounts"));
+                return Result.Failure<GeneralResponse<List<DiscountResponseDTO>>>(new Error("Discount.QueryFailed", $"No active discounts"));
             }
             var discountDtos = _mapper.Map<List<DiscountResponseDTO>>(activeDiscounts);
-            return Result.Success(discountDtos);
+            return Result<GeneralResponse<List<DiscountResponseDTO>>>.Success(GeneralResponse<List<DiscountResponseDTO>>.CreateSuccess(discountDtos));
         }
         catch (Exception ex)
         {
-            return Result.Failure<List<DiscountResponseDTO>>(new Error("Discount.QueryFailed", $"Failed to retrieve active discounts: {ex.Message}"));
+            return Result.Failure<GeneralResponse<List<DiscountResponseDTO>>>(new Error("Discount.QueryFailed", $"Failed to retrieve active discounts: {ex.Message}"));
         }
     }
 }

@@ -8,7 +8,7 @@ using MediatR;
 namespace Ecommerce.APPLICATION.Features.OrderItems.Queries.GetOrderItemsByOrder;
 
 public class GetOrderItemsByOrderQueryHandler 
-    : IRequestHandler<GetOrderItemsByOrderQuery, Result<PagedResult<OrderItemResponseDTO>>>
+    : IRequestHandler<GetOrderItemsByOrderQuery, Result<GeneralResponse<PagedResult<OrderItemResponseDTO>>>>
 {
     private readonly IOrderItemsRepository _orderItemsRepository;
     private readonly IMapper _mapper;
@@ -21,7 +21,7 @@ public class GetOrderItemsByOrderQueryHandler
         _mapper = mapper;
     }
 
-    public async Task<Result<PagedResult<OrderItemResponseDTO>>> Handle(
+    public async Task<Result<GeneralResponse<PagedResult<OrderItemResponseDTO>>>> Handle(
         GetOrderItemsByOrderQuery request,
         CancellationToken cancellationToken)
     {
@@ -29,6 +29,12 @@ public class GetOrderItemsByOrderQueryHandler
         {
             var orderId = OrderId.Create(request.OrderId);
             var orderItems = (await _orderItemsRepository.GetByOrderIdAsync(orderId.Id)).ToList();
+
+            if (orderItems == null || !orderItems.Any())
+                return Result<GeneralResponse<PagedResult<OrderItemResponseDTO>>>.Success(
+                    GeneralResponse<PagedResult<OrderItemResponseDTO>>.CreateSuccess(
+                        new PagedResult<OrderItemResponseDTO>(new List<OrderItemResponseDTO>(), request.PageNumber, request.PageSize, 0),
+                        "No order items found for this order"));
 
             // Calculate pagination
             var totalCount = orderItems.Count;
@@ -45,11 +51,12 @@ public class GetOrderItemsByOrderQueryHandler
                 request.PageSize,
                 totalCount);
 
-            return Result.Success(pagedResult);
+            return Result<GeneralResponse<PagedResult<OrderItemResponseDTO>>>.Success(
+                GeneralResponse<PagedResult<OrderItemResponseDTO>>.CreateSuccess(pagedResult));
         }
         catch (Exception ex)
         {
-            return Result.Failure<PagedResult<OrderItemResponseDTO>>(
+            return Result.Failure<GeneralResponse<PagedResult<OrderItemResponseDTO>>>(
                 new Error("OrderItem.QueryFailed", $"Failed to retrieve order items: {ex.Message}"));
         }
     }

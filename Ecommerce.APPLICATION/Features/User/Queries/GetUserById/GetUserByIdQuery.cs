@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Users.Queries.GetUserById;
 
-public record GetUserByIdQuery(Guid UserId) : IRequest<Result<UserResponseDTO>>;
+public record GetUserByIdQuery(Guid UserId) : IRequest<Result<GeneralResponse<UserResponseDTO>>>;

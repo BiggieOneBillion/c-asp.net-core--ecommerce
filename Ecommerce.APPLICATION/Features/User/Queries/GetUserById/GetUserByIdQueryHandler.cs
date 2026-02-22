@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Users.Queries.GetUserById;
 
-public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, Result<UserResponseDTO>>
+public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, Result<GeneralResponse<UserResponseDTO>>>
 {
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
@@ -20,7 +20,7 @@ public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, Result<
         _mapper = mapper;
     }
 
-    public async Task<Result<UserResponseDTO>> Handle(
+    public async Task<Result<GeneralResponse<UserResponseDTO>>> Handle(
         GetUserByIdQuery request,
         CancellationToken cancellationToken)
     {
@@ -32,17 +32,18 @@ public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, Result<
 
             if (user == null)
             {
-                return Result.Failure<UserResponseDTO>(
+                return Result.Failure<GeneralResponse<UserResponseDTO>>(
                     new Error("User.NotFound", $"User with ID {request.UserId} not found"));
             }
 
             var userDto = _mapper.Map<UserResponseDTO>(user);
 
-            return Result.Success(userDto);
+            return Result<GeneralResponse<UserResponseDTO>>.Success(
+                GeneralResponse<UserResponseDTO>.CreateSuccess(userDto));
         }
         catch (Exception ex)
         {
-            return Result.Failure<UserResponseDTO>(
+            return Result.Failure<GeneralResponse<UserResponseDTO>>(
                 new Error("User.QueryFailed", $"Failed to retrieve user: {ex.Message}"));
         }
     }

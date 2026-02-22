@@ -1,4 +1,6 @@
-using Ecommerce.APPLICATION.Common.Interfaces;
+using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
+using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.OrderItems.Commands.UpdateOrderItem;
 
@@ -8,4 +10,4 @@ public record UpdateOrderItemCommand(
     Guid ProductId,
     int Quantity,
     DateTime CreateAt
-) : ICommand;
+) : IRequest<Result<GeneralResponse<Unit>>>;

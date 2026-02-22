@@ -1,6 +1,6 @@
-using Ecommerce.APPLICATION.Common.Models;
 using Ecommerce.APPLICATION.Common.Interfaces;
-using Ecommerce.CORE.Common;
+using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
@@ -8,92 +8,103 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Orders.Commands.CreateOrder;
 
-public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Result<Guid>>
+public class CreateOrderCommandHandler 
+    : IRequestHandler<CreateOrderCommand, Result<GeneralResponse<Guid>>>
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IOrderRepository _orderRepository;
     private readonly IProductRepository _productRepository;
-    private readonly IDiscountRepository _discountRepository;
+    private readonly IInventoryRepository _inventoryRepository;
     private readonly IDiscountService _discountService;
+    private readonly IUnitOfWork _unitOfWork;
 
     public CreateOrderCommandHandler(
-        IUnitOfWork unitOfWork, 
         IOrderRepository orderRepository,
         IProductRepository productRepository,
-        IDiscountRepository discountRepository,
-        IDiscountService discountService)
+        IInventoryRepository inventoryRepository,
+        IDiscountService discountService,
+        IUnitOfWork unitOfWork)
     {
-        _unitOfWork = unitOfWork;
         _orderRepository = orderRepository;
         _productRepository = productRepository;
-        _discountRepository = discountRepository;
+        _inventoryRepository = inventoryRepository;
         _discountService = discountService;
+        _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<Guid>> Handle(
-        CreateOrderCommand request,
+    public async Task<Result<GeneralResponse<Guid>>> Handle(
+        CreateOrderCommand request, 
         CancellationToken cancellationToken)
     {
         try
         {
             var userId = UserId.Create(request.UserId);
-            var paymentId = PaymentId.Create(request.PaymentId);
+            var orderItemsList = new List<Ecommerce.CORE.Entity.OrderItems>();
+            var discountInputItems = new List<(Guid ProductId, Guid CategoryId, decimal Price, int Quantity)>();
+            decimal subtotal = 0;
 
-            // Fetch products to get CategoryIds for discount calculation
-            var productIds = request.Items.Select(i => i.ProductId).ToList();
-            // var products = await _productRepository.GetAllAsync(); // In a real app, use GetByIdsAsync
-            var products = await _productRepository.GetByIdsAsync(productIds);
-            // var productsMap = products.Where(p => productIds.Contains(p.Id.Id))
-            //                           .ToDictionary(p => p.Id.Id, p => p.CategoryId.Id);
-            var productsMap = products.ToDictionary(p => p.Id.Id, p => p.CategoryId.Id);
-
-            var discountItems = request.Items.Select(i => (
-                i.ProductId,
-                productsMap.GetValueOrDefault(i.ProductId),
-                i.PricePerUnit,
-                i.Quantity
-            )).ToList();
-
-            decimal subTotal = request.Items.Sum(i => i.PricePerUnit * i.Quantity);
-            var (discountAmount, appliedDiscountId) = await _discountService.CalculateDiscountAsync(
-                request.UserId, 
-                subTotal, 
-                discountItems, 
-                request.CouponCode);
-
-            // Increment UsageCount if a discount was applied
-            if (appliedDiscountId.HasValue)
+            foreach (var item in request.Items)
             {
-                var discount = await _discountRepository.GetByIdAsync(appliedDiscountId.Value);
-                if (discount != null)
-                {
-                    discount.UsageCount++;
-                    await _discountRepository.UpdateAsync(discount);
-                }
+                var product = await _productRepository.GetByIdAsync(item.ProductId);
+                if (product == null)
+                    return Result.Failure<GeneralResponse<Guid>>(
+                        new Error("Order.ProductNotFound", $"Product with ID {item.ProductId} not found"));
+
+                var inventory = await _inventoryRepository.GetByProductIdAsync(product.Id.Id);
+                if (inventory == null || inventory.StockQuantity < item.Quantity)
+                    return Result.Failure<GeneralResponse<Guid>>(
+                        new Error("Order.InsufficientStock", $"Insufficient stock for product {product.Name}"));
+
+                // We'll create order items.
+                // The current OrderItems entity constructor requires an OrderId which is unknown at this point.
+                // However, the factory method Order.Create will handle the collection.
+                // We'll pass null for orderId and let the factory or EF Core handle it if possible, 
+                // but OrderItems constructor expects it. 
+                // Let's use Guid.Empty as a placeholder if necessary, but ideally we'd have a way to create them without OrderId.
+                
+                var orderItem = new Ecommerce.CORE.Entity.OrderItems(
+                    OrderId.Create(Guid.Empty), // Placeholder
+                    product.Id,
+                    item.Quantity,
+                    product.CurrentPrice
+                );
+
+                orderItemsList.Add(orderItem);
+                subtotal += product.CurrentPrice * item.Quantity;
+                
+                discountInputItems.Add((product.Id.Id, product.CategoryId.Id, product.CurrentPrice, item.Quantity));
+                
+                // Deduct stock
+                inventory.AdjustStock(-item.Quantity);
+                await _inventoryRepository.UpdateAsync(inventory);
             }
 
-            var items = request.Items.Select(i => new CORE.Entity.OrderItems(
-                OrderId.Create(Guid.Empty), // Will be set by factory
-                ProductId.Create(i.ProductId),
-                i.Quantity,
-                i.PricePerUnit
-            )).ToList();
+            // Calculate discounts
+            var (discountAmount, appliedDiscountId) = await _discountService.CalculateDiscountAsync(
+                request.UserId, 
+                subtotal, 
+                discountInputItems, 
+                request.CouponCode);
 
-            var order = Order.Create(userId, paymentId, items, discountAmount, appliedDiscountId);
+            // Create Order using factory
+            var tempPaymentId = PaymentId.Create(Guid.Empty); 
+
+            var order = Order.Create(
+                userId,
+                tempPaymentId,
+                orderItemsList,
+                discountAmount,
+                appliedDiscountId
+            );
 
             await _orderRepository.CreateAsync(order);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(order.Id.Id);
-        }
-        catch (DomainException ex)
-        {
-            return Result.Failure<Guid>(
-                new Error("Order.DomainError", ex.Message));
+            return Result<GeneralResponse<Guid>>.Success(
+                GeneralResponse<Guid>.CreateSuccess(order.Id.Id, "Order created successfully", 201));
         }
         catch (Exception ex)
         {
-            return Result.Failure<Guid>(
+            return Result.Failure<GeneralResponse<Guid>>(
                 new Error("Order.CreateFailed", $"Failed to create order: {ex.Message}"));
         }
     }

@@ -1,14 +1,13 @@
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.APPLICATION.Services;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using MediatR;
 
-
-
 namespace Ecommerce.APPLICATION.Features.Users.Commands.CreateUser;
 
-public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Result<Guid>>
+public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Result<GeneralResponse<Guid>>>
 {
     private readonly IUserRepository _userRepository;
     private readonly IPasswordService _passwordService;
@@ -22,7 +21,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
         _passwordService = passwordService;
     }
 
-    public async Task<Result<Guid>> Handle(
+    public async Task<Result<GeneralResponse<Guid>>> Handle(
         CreateUserCommand request,
         CancellationToken cancellationToken)
     {
@@ -32,7 +31,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
             var existingUser = await _userRepository.GetUserByEmailAsync(request.Email);
             if (existingUser != null)
             {
-                return Result.Failure<Guid>(
+                return Result.Failure<GeneralResponse<Guid>>(
                     new Error("User.EmailExists", "A user with this email already exists"));
             }
 
@@ -40,7 +39,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
             var hashedPassword = _passwordService.HashPassword(request.Password);
 
 
-        CORE.Entity.Users user = new(
+            CORE.Entity.Users user = new(
                     name: request.Name,
                     email: request.Email,
                     passwordHash: hashedPassword,
@@ -49,11 +48,12 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
 
             await _userRepository.CreateAsync(user);
 
-            return Result.Success(userId);
+            return Result<GeneralResponse<Guid>>.Success(
+                GeneralResponse<Guid>.CreateSuccess(userId, "User created successfully", 201));
         }
         catch (Exception ex)
         {
-            return Result.Failure<Guid>(
+            return Result.Failure<GeneralResponse<Guid>>(
                 new Error("User.CreateFailed", $"Failed to create user: {ex.Message}"));
         }
     }

@@ -1,11 +1,11 @@
-using Ecommerce.APPLICATION.Common.Interfaces;
 using Ecommerce.APPLICATION.Common.Models;
 using Ecommerce.APPLICATION.ResponseDTOs;
+using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Orders.Queries.GetOrdersByUser;
 
-public record GetOrdersByUserQuery(
-    Guid UserId,
-    int PageNumber = 1,
-    int PageSize = 10
-) : IQuery<PagedResult<OrderResponseDTO>>;
+/// <summary>
+/// Query to retrieve all orders for a specific user
+/// </summary>
+/// <param name="UserId">User ID</param>
+public record GetOrdersByUserQuery(Guid UserId) : IRequest<Result<GeneralResponse<List<OrderResponseDTO>>>>;

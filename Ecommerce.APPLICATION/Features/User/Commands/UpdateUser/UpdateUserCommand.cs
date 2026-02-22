@@ -1,4 +1,6 @@
-using Ecommerce.APPLICATION.Common.Interfaces;
+using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
+using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Users.Commands.UpdateUser;
 
@@ -7,4 +9,4 @@ public record UpdateUserCommand(
     string Name,
     string Email,
     string? Password = null
-) : ICommand;
+) : IRequest<Result<GeneralResponse<Unit>>>;

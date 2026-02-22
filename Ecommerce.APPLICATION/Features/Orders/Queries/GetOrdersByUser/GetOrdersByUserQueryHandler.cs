@@ -2,55 +2,38 @@ using AutoMapper;
 using Ecommerce.APPLICATION.Common.Models;
 using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Interfaces;
-using Ecommerce.CORE.ValueObjects;
 using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Orders.Queries.GetOrdersByUser;
 
 public class GetOrdersByUserQueryHandler 
-    : IRequestHandler<GetOrdersByUserQuery, Result<PagedResult<OrderResponseDTO>>>
+    : IRequestHandler<GetOrdersByUserQuery, Result<GeneralResponse<List<OrderResponseDTO>>>>
 {
     private readonly IOrderRepository _orderRepository;
     private readonly IMapper _mapper;
 
-    public GetOrdersByUserQueryHandler(
-        IOrderRepository orderRepository,
-        IMapper mapper)
+    public GetOrdersByUserQueryHandler(IOrderRepository orderRepository, IMapper mapper)
     {
         _orderRepository = orderRepository;
         _mapper = mapper;
     }
 
-    public async Task<Result<PagedResult<OrderResponseDTO>>> Handle(
-        GetOrdersByUserQuery request,
+    public async Task<Result<GeneralResponse<List<OrderResponseDTO>>>> Handle(
+        GetOrdersByUserQuery request, 
         CancellationToken cancellationToken)
     {
         try
         {
-            var userId = UserId.Create(request.UserId);
-            var orders = (await _orderRepository.GetByUserIdAsync(userId.Id)).ToList();
+            var orders = await _orderRepository.GetByUserIdAsync(request.UserId);
+            var orderDtos = _mapper.Map<List<OrderResponseDTO>>(orders);
 
-            // Calculate pagination
-            var totalCount = orders.Count;
-            var items = orders
-                .Skip((request.PageNumber - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToList();
-
-            var orderDtos = _mapper.Map<List<OrderResponseDTO>>(items);
-
-            var pagedResult = new PagedResult<OrderResponseDTO>(
-                orderDtos,
-                request.PageNumber,
-                request.PageSize,
-                totalCount);
-
-            return Result.Success(pagedResult);
+            return Result<GeneralResponse<List<OrderResponseDTO>>>.Success(
+                GeneralResponse<List<OrderResponseDTO>>.CreateSuccess(orderDtos));
         }
         catch (Exception ex)
         {
-            return Result.Failure<PagedResult<OrderResponseDTO>>(
-                new Error("Order.QueryFailed", $"Failed to retrieve orders: {ex.Message}"));
+            return Result.Failure<GeneralResponse<List<OrderResponseDTO>>>(
+                new Error("Order.QueryFailed", $"Failed to retrieve orders for user: {ex.Message}"));
         }
     }
 }

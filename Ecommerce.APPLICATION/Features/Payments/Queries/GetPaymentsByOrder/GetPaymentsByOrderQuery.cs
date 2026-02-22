@@ -9,4 +9,4 @@ public record GetPaymentsByOrderQuery(
     Guid OrderId,
     int PageNumber = 1,
     int PageSize = 10
-) : IRequest<Result<PagedResult<PaymentResponseDTO>>>;
+) : IRequest<Result<GeneralResponse<PagedResult<PaymentResponseDTO>>>>;

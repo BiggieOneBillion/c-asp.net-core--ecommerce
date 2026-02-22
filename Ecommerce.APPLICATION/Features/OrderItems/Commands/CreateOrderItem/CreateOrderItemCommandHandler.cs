@@ -1,4 +1,5 @@
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.OrderItems.Commands.CreateOrderItem;
 
-public class CreateOrderItemCommandHandler : IRequestHandler<CreateOrderItemCommand, Result<Guid>>
+public class CreateOrderItemCommandHandler : IRequestHandler<CreateOrderItemCommand, Result<GeneralResponse<Guid>>>
 {
     private readonly IOrderItemsRepository _orderItemsRepository;
     private readonly IProductRepository _productRepository;
@@ -17,13 +18,12 @@ public class CreateOrderItemCommandHandler : IRequestHandler<CreateOrderItemComm
         _productRepository = productRepository;
     }
 
-    public async Task<Result<Guid>> Handle(
+    public async Task<Result<GeneralResponse<Guid>>> Handle(
         CreateOrderItemCommand request,
         CancellationToken cancellationToken)
     {
         try
         {
-            var orderItemId = Guid.NewGuid();
             var orderId = OrderId.Create(request.OrderId);
             var productId = ProductId.Create(request.ProductId);
 
@@ -32,7 +32,7 @@ public class CreateOrderItemCommandHandler : IRequestHandler<CreateOrderItemComm
 
             if(product == null)
             {
-                return Result.Failure<Guid>(
+                return Result.Failure<GeneralResponse<Guid>>(
                     new Error("Product.NotFound", $"Product with ID {request.ProductId} not found"));
             }
 
@@ -46,11 +46,12 @@ public class CreateOrderItemCommandHandler : IRequestHandler<CreateOrderItemComm
 
             await _orderItemsRepository.CreateAsync(orderItem);
 
-            return Result.Success(orderItemId);
+            return Result<GeneralResponse<Guid>>.Success(
+                GeneralResponse<Guid>.CreateSuccess(orderItem.Id.Id, "Order item created successfully", 201));
         }
         catch (Exception ex)
         {
-            return Result.Failure<Guid>(
+            return Result.Failure<GeneralResponse<Guid>>(
                 new Error("OrderItem.CreateFailed", $"Failed to create order item: {ex.Message}"));
         }
     }

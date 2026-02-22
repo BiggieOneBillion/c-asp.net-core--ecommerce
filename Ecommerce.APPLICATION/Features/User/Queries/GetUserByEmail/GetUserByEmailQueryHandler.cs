@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Users.Queries.GetUserByEmail;
 
-public class GetUserByEmailQueryHandler : IRequestHandler<GetUserByEmailQuery, Result<UserResponseDTO>>
+public class GetUserByEmailQueryHandler : IRequestHandler<GetUserByEmailQuery, Result<GeneralResponse<UserResponseDTO>>>
 {
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
@@ -19,7 +19,7 @@ public class GetUserByEmailQueryHandler : IRequestHandler<GetUserByEmailQuery, R
         _mapper = mapper;
     }
 
-    public async Task<Result<UserResponseDTO>> Handle(
+    public async Task<Result<GeneralResponse<UserResponseDTO>>> Handle(
         GetUserByEmailQuery request,
         CancellationToken cancellationToken)
     {
@@ -29,17 +29,18 @@ public class GetUserByEmailQueryHandler : IRequestHandler<GetUserByEmailQuery, R
 
             if (user == null)
             {
-                return Result.Failure<UserResponseDTO>(
+                return Result.Failure<GeneralResponse<UserResponseDTO>>(
                     new Error("User.NotFound", $"User with email {request.Email} not found"));
             }
 
             var userDto = _mapper.Map<UserResponseDTO>(user);
 
-            return Result.Success(userDto);
+            return Result<GeneralResponse<UserResponseDTO>>.Success(
+                GeneralResponse<UserResponseDTO>.CreateSuccess(userDto));
         }
         catch (Exception ex)
         {
-            return Result.Failure<UserResponseDTO>(
+            return Result.Failure<GeneralResponse<UserResponseDTO>>(
                 new Error("User.QueryFailed", $"Failed to retrieve user: {ex.Message}"));
         }
     }

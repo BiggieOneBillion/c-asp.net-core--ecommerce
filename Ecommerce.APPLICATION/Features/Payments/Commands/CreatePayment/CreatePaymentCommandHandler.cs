@@ -1,4 +1,5 @@
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Payments.Commands.CreatePayment;
 
-public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand, Result<Guid>>
+public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand, Result<GeneralResponse<Guid>>>
 {
     private readonly IPaymentRepository _paymentRepository;
 
@@ -15,13 +16,12 @@ public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand,
         _paymentRepository = paymentRepository;
     }
 
-    public async Task<Result<Guid>> Handle(
+    public async Task<Result<GeneralResponse<Guid>>> Handle(
         CreatePaymentCommand request,
         CancellationToken cancellationToken)
     {
         try
         {
-            var paymentId = Guid.NewGuid();
             var orderId = OrderId.Create(request.OrderId);
 
             Payment payment = Payment.Create(
@@ -31,11 +31,12 @@ public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand,
 
             await _paymentRepository.CreateAsync(payment);
 
-            return Result.Success(paymentId);
+            return Result<GeneralResponse<Guid>>.Success(
+                GeneralResponse<Guid>.CreateSuccess(payment.Id.Id, "Payment created successfully", 201));
         }
         catch (Exception ex)
         {
-            return Result.Failure<Guid>(
+            return Result.Failure<GeneralResponse<Guid>>(
                 new Error("Payment.CreateFailed", $"Failed to create payment: {ex.Message}"));
         }
     }

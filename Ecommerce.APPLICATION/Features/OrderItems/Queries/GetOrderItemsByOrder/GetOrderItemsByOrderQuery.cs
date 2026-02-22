@@ -9,4 +9,4 @@ public record GetOrderItemsByOrderQuery(
     Guid OrderId,
     int PageNumber = 1,
     int PageSize = 10
-) : IRequest<Result<PagedResult<OrderItemResponseDTO>>>;
+) : IRequest<Result<GeneralResponse<PagedResult<OrderItemResponseDTO>>>>;

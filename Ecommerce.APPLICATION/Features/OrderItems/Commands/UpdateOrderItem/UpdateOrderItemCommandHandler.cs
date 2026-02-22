@@ -1,4 +1,5 @@
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.OrderItems.Commands.UpdateOrderItem;
 
-public class UpdateOrderItemCommandHandler : IRequestHandler<UpdateOrderItemCommand, Result>
+public class UpdateOrderItemCommandHandler : IRequestHandler<UpdateOrderItemCommand, Result<GeneralResponse<Unit>>>
 {
     private readonly IOrderItemsRepository _orderItemsRepository;
 
@@ -15,7 +16,7 @@ public class UpdateOrderItemCommandHandler : IRequestHandler<UpdateOrderItemComm
         _orderItemsRepository = orderItemsRepository;
     }
 
-    public async Task<Result> Handle(
+    public async Task<Result<GeneralResponse<Unit>>> Handle(
         UpdateOrderItemCommand request,
         CancellationToken cancellationToken)
     {
@@ -26,7 +27,7 @@ public class UpdateOrderItemCommandHandler : IRequestHandler<UpdateOrderItemComm
 
             if (orderItem == null)
             {
-                return Result.Failure(
+                return Result.Failure<GeneralResponse<Unit>>(
                     new Error("OrderItem.NotFound", $"Order item with ID {request.OrderItemId} not found"));
             }
 
@@ -38,11 +39,12 @@ public class UpdateOrderItemCommandHandler : IRequestHandler<UpdateOrderItemComm
 
             await _orderItemsRepository.UpdateAsync(orderItem);
 
-            return Result.Success();
+            return Result<GeneralResponse<Unit>>.Success(
+                GeneralResponse<Unit>.CreateSuccess(Unit.Value, "Order item updated successfully"));
         }
         catch (Exception ex)
         {
-            return Result.Failure(
+            return Result.Failure<GeneralResponse<Unit>>(
                 new Error("OrderItem.UpdateFailed", $"Failed to update order item: {ex.Message}"));
         }
     }

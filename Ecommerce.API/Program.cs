@@ -116,19 +116,26 @@ app.UseMiddleware<Ecommerce.API.Middleware.RateLimitingMiddleware>();
 app.MapControllers();
 
 // Hangfire Dashboard
-app.UseHangfireDashboard();
+// app.UseHangfireDashboard();
 
-// Schedule Recurring Job
-using (var scope = app.Services.CreateScope())
-{
-    var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
-    recurringJobManager.AddOrUpdate<ProcessOutboxMessagesJob>(
-        "outbox-processor",
-        job => job.Execute(),
-        Cron.Minutely);
-}
+// // Schedule Recurring Job
+// using (var scope = app.Services.CreateScope())
+// {
+//     var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+//     recurringJobManager.AddOrUpdate<ProcessOutboxMessagesJob>(
+//         "outbox-processor",
+//         job => job.Execute(),
+//         Cron.Minutely);
+// }
 
 app.MapGet("/", () => "Ecommerce Backend is running. Visit /swagger for documentation.");
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    // This will apply any pending migrations on startup
+    context.Database.Migrate();
+}
   
 // if (app.Environment.IsDevelopment())
 // {

@@ -32,6 +32,12 @@ public class GetAllProductsQueryHandler
         {
             var products = (await _productRepository.GetAllAsync()).ToList();
 
+            if (products == null)
+                return Result.Failure<PagedResult<ProductResponseDTO>>(
+                    new Error("Product.NotFound", "No products found"));
+
+            
+
             // Calculate pagination
             var totalCount = products.Count;
             var items = products

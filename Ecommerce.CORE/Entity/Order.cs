@@ -7,9 +7,9 @@ namespace Ecommerce.CORE.Entity;
 
 public class Order : AggregateRoot<OrderId>
 {
-    private readonly List<OrderItems> _orderItems = new();
+    private readonly List<Ecommerce.CORE.Entity.OrderItems> _orderItems = new();
     
-    public UserId UserId { get; private set; } = default;
+    public UserId UserId { get; private set; } = default!;
     public PaymentId? PaymentId { get; private set; }
     public Guid? AppliedDiscountId { get; private set; }
     public OrderStatus Status { get; private set; }
@@ -17,13 +17,13 @@ public class Order : AggregateRoot<OrderId>
     public decimal DiscountAmount { get; private set; }
     public DateTime CreatedAt { get; private set; }
     
-    public IReadOnlyCollection<OrderItems> OrderItems => _orderItems.AsReadOnly();
+    public IReadOnlyCollection<Ecommerce.CORE.Entity.OrderItems> OrderItems => _orderItems.AsReadOnly();
     
     // Private constructor for EF Core
     private Order() { }
     
     // Factory method
-    public static Order Create(UserId userId, PaymentId paymentId, List<OrderItems> items, decimal discountAmount = 0, Guid? appliedDiscountId = null)
+    public static Order Create(UserId userId, PaymentId paymentId, List<Ecommerce.CORE.Entity.OrderItems> items, decimal discountAmount = 0, Guid? appliedDiscountId = null)
     {
         if (items == null || !items.Any())
             throw new DomainException("Order must have at least one item");
@@ -48,14 +48,14 @@ public class Order : AggregateRoot<OrderId>
         
         // Raise domain event
         var itemsData = items.Select(i => new OrderItemData(
-            i.ProductId.Id, // Using Value() method from ProductId
+            i.ProductId.Id, 
             i.Quantity,
             i.PricePerUnitAtPurchaseTime
         )).ToList();
         
         order.RaiseDomainEvent(new OrderCreatedDomainEvent(
-            order.Id.Id, // Using Value() method from OrderId
-            order.UserId.Id, // Using Value() method from UserId
+            order.Id.Id, 
+            order.UserId.Id, 
             order.TotalAmount,
             itemsData
         ));
@@ -70,8 +70,8 @@ public class Order : AggregateRoot<OrderId>
         
         Status = OrderStatus.Confirmed;
         RaiseDomainEvent(new OrderConfirmedDomainEvent(
-            Guid.Parse(Id.Value()), 
-            Guid.Parse(UserId.Value())
+            Id.Id, 
+            UserId.Id
         ));
     }
     
@@ -88,4 +88,8 @@ public class Order : AggregateRoot<OrderId>
         var subTotal = _orderItems.Sum(i => i.PricePerUnitAtPurchaseTime * i.Quantity);
         TotalAmount = subTotal - DiscountAmount;
     }
+
+    // Adding missing property if needed by handlers
+    public DateTime OrderDate { get; set; }
+    public decimal Subtotal { get; set; }
 }

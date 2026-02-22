@@ -24,5 +24,38 @@ public class Discount : AggregateRoot<Guid>
     
     public bool IsActive { get; set; } = true;
 
-    // Concurrency check or audit fields are already in BaseEntity
+    // Private constructor for EF Core
+    private Discount() { }
+
+    // Factory method
+    public static Discount Create(
+        string name, 
+        string? description, 
+        string? code, 
+        DiscountType type, 
+        decimal value, 
+        DiscountScope scope, 
+        Guid? targetId,
+        DateTime startDate,
+        DateTime endDate,
+        decimal? minimumOrderAmount = null,
+        int? usageLimit = null)
+    {
+        return new Discount
+        {
+            Id = Guid.NewGuid(),
+            Name = name,
+            Description = description,
+            Code = code,
+            Type = type,
+            Value = value,
+            Scope = scope,
+            TargetId = targetId,
+            StartDate = startDate,
+            EndDate = endDate,
+            MinimumOrderAmount = minimumOrderAmount,
+            UsageLimit = usageLimit,
+            IsActive = true
+        };
+    }
 }

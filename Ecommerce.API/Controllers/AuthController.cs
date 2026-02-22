@@ -9,6 +9,7 @@ using Ecommerce.APPLICATION.Features.Auth.Commands.VerifyEmail;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Ecommerce.APPLICATION.Features.Auth.Commands.ResendVerification;
+using Ecommerce.APPLICATION.ResponseDTOs;
 
 namespace Ecommerce.API.Controllers;
 
@@ -31,17 +32,16 @@ public class AuthController : ControllerBase
     /// Register a new user
     /// </summary>
     /// <param name="request">Registration details</param>
-    /// <returns>User details and tokens</returns>
+    /// <returns>Status message</returns>
     [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         var result = await _mediator.Send(new RegisterCommand(request));
-        if (!result.IsSuccess) return BadRequest(result.Error);
+        if (!result.IsSuccess) return BadRequest(GeneralResponse<object>.CreateFailure(result.Error.Message, 400));
 
-        SetRefreshTokenCookie(result.Value.RefreshToken);
-        return Ok(result.Value);
+        return StatusCode(result.Value.StatusCode, result.Value);
     }
 
     /// <summary>
@@ -56,9 +56,9 @@ public class AuthController : ControllerBase
     {
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
         var result = await _mediator.Send(new LoginCommand(request, ipAddress));
-        if (!result.IsSuccess) return Unauthorized(result.Error);
+        if (!result.IsSuccess) return Unauthorized(GeneralResponse<object>.CreateFailure(result.Error.Message, 401));
 
-        SetRefreshTokenCookie(result.Value.RefreshToken);
+        SetRefreshTokenCookie(result.Value.Data!.RefreshToken);
         return Ok(result.Value);
     }
 
@@ -73,13 +73,13 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Refresh()
     {
         var refreshToken = Request.Cookies["refreshToken"];
-        if (string.IsNullOrEmpty(refreshToken)) return BadRequest("Refresh token is missing.");
+        if (string.IsNullOrEmpty(refreshToken)) return BadRequest(GeneralResponse<object>.CreateFailure("Refresh token is missing.", 400));
 
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
         var result = await _mediator.Send(new RefreshTokenCommand(new RefreshTokenRequest(refreshToken), ipAddress));
-        if (!result.IsSuccess) return Unauthorized(result.Error);
+        if (!result.IsSuccess) return Unauthorized(GeneralResponse<object>.CreateFailure(result.Error.Message, 401));
 
-        SetRefreshTokenCookie(result.Value.RefreshToken);
+        SetRefreshTokenCookie(result.Value.Data!.RefreshToken);
         return Ok(result.Value);
     }
 
@@ -96,11 +96,16 @@ public class AuthController : ControllerBase
 
         if (!string.IsNullOrEmpty(refreshToken))
         {
-            await _mediator.Send(new LogoutCommand(refreshToken, accessToken));
+            var result = await _mediator.Send(new LogoutCommand(refreshToken, accessToken));
+            if (result.IsSuccess)
+            {
+                Response.Cookies.Delete("refreshToken");
+                return Ok(result.Value);
+            }
         }
 
         Response.Cookies.Delete("refreshToken");
-        return Ok(new { message = "Logged out successfully" });
+        return Ok(GeneralResponse<Unit>.CreateSuccess(Unit.Value, "Logged out successfully"));
     }
 
     /// <summary>
@@ -135,15 +140,17 @@ public class AuthController : ControllerBase
     /// Verify user email
     /// </summary>
     /// <param name="request">Verification token</param>
-    /// <returns>Success message</returns>
+    /// <returns>Auth details and tokens</returns>
     [HttpPost("verify-email")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
     {
         var result = await _mediator.Send(new VerifyEmailCommand(request.Token, request.Email));
-        if (!result.IsSuccess) return BadRequest(result.Error);
-        return Ok(new { message = "Email verified successfully." });
+        if (!result.IsSuccess) return BadRequest(GeneralResponse<object>.CreateFailure(result.Error.Message, 400));
+        
+        SetRefreshTokenCookie(result.Value.Data!.RefreshToken);
+        return Ok(result.Value);
     }
 
     /// <summary>

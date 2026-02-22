@@ -1,14 +1,12 @@
 using Ecommerce.APPLICATION.Features.Orders.Commands.CreateOrder;
 using Ecommerce.APPLICATION.Features.Orders.Queries.GetOrderById;
 using Ecommerce.APPLICATION.Features.Orders.Queries.GetOrdersByUser;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.API.Controllers;
 
-/// <summary>
-/// Controller for managing orders
-/// </summary>
 [ApiController]
 [Route("api/v1/orders")]
 [Produces("application/json")]
@@ -21,69 +19,27 @@ public class OrdersController : ControllerBase
         _mediator = mediator;
     }
 
-    /// <summary>
-    /// Get order by ID
-    /// </summary>
-    /// <param name="id">Order ID</param>
-    /// <returns>Order details</returns>
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetOrderById(Guid id)
+    public async Task<IActionResult> GetById(Guid id)
     {
-        var query = new GetOrderByIdQuery(id);
-        var result = await _mediator.Send(query);
-
-        if (result.IsFailure)
-            return NotFound(new { error = result.Error.Message });
-
+        var result = await _mediator.Send(new GetOrderByIdQuery(id));
+        if (!result.IsSuccess) return NotFound(GeneralResponse<object>.CreateFailure(result.Error.Message, 404));
         return Ok(result.Value);
     }
 
-    /// <summary>
-    /// Get orders by user
-    /// </summary>
-    /// <param name="userId">User ID</param>
-    /// <param name="pageNumber">Page number (default: 1)</param>
-    /// <param name="pageSize">Page size (default: 10)</param>
-    /// <returns>Paged list of user orders</returns>
     [HttpGet("user/{userId:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetOrdersByUser(
-        Guid userId,
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetByUser(Guid userId)
     {
-        var query = new GetOrdersByUserQuery(userId, pageNumber, pageSize);
-        var result = await _mediator.Send(query);
-
-        if (result.IsFailure)
-            return BadRequest(new { error = result.Error.Message });
-
+        var result = await _mediator.Send(new GetOrdersByUserQuery(userId));
+        if (!result.IsSuccess) return BadRequest(GeneralResponse<object>.CreateFailure(result.Error.Message, 400));
         return Ok(result.Value);
     }
 
-    /// <summary>
-    /// Create a new order
-    /// </summary>
-    /// <param name="command">Order creation details</param>
-    /// <returns>Created order ID</returns>
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> CreateOrder([FromBody] CreateOrderCommand command)
+    public async Task<IActionResult> Create([FromBody] CreateOrderCommand command)
     {
         var result = await _mediator.Send(command);
-
-        if (result.IsFailure)
-            return BadRequest(new { error = result.Error.Message });
-
-        return CreatedAtAction(
-            nameof(GetOrderById),
-            new { id = result.Value },
-            new { id = result.Value });
+        if (!result.IsSuccess) return BadRequest(GeneralResponse<object>.CreateFailure(result.Error.Message, 400));
+        return StatusCode(201, result.Value);
     }
 }

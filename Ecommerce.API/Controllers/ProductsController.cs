@@ -5,14 +5,12 @@ using Ecommerce.APPLICATION.Features.Products.Commands.UpdateProductPrice;
 using Ecommerce.APPLICATION.Features.Products.Queries.GetAllProducts;
 using Ecommerce.APPLICATION.Features.Products.Queries.GetProductById;
 using Ecommerce.APPLICATION.Features.Products.Queries.GetProductsByCategory;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.API.Controllers;
 
-/// <summary>
-/// Controller for managing products
-/// </summary>
 [ApiController]
 [Route("api/v1/products")]
 [Produces("application/json")]
@@ -25,163 +23,63 @@ public class ProductsController : ControllerBase
         _mediator = mediator;
     }
 
-    /// <summary>
-    /// Get all products with pagination
-    /// </summary>
-    /// <param name="pageNumber">Page number (default: 1)</param>
-    /// <param name="pageSize">Page size (default: 10)</param>
-    /// <returns>Paged list of products</returns>
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetAllProducts(
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetAllProducts([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
-        var query = new GetAllProductsQuery(pageNumber, pageSize);
-        var result = await _mediator.Send(query);
-
-        if (result.IsFailure)
-            return BadRequest(new { error = result.Error.Message });
-
+        var result = await _mediator.Send(new GetAllProductsQuery(pageNumber, pageSize));
+        if (!result.IsSuccess) return BadRequest(GeneralResponse<object>.CreateFailure(result.Error.Message, 400));
         return Ok(result.Value);
     }
 
-    /// <summary>
-    /// Get product by ID
-    /// </summary>
-    /// <param name="id">Product ID</param>
-    /// <returns>Product details</returns>
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetProductById(Guid id)
     {
-        var query = new GetProductByIdQuery(id);
-        var result = await _mediator.Send(query);
-
-        if (result.IsFailure)
-            return NotFound(new { error = result.Error.Message });
-
+        var result = await _mediator.Send(new GetProductByIdQuery(id));
+        if (!result.IsSuccess) return NotFound(GeneralResponse<object>.CreateFailure(result.Error.Message, 404));
         return Ok(result.Value);
     }
 
-    /// <summary>
-    /// Get products by category
-    /// </summary>
-    /// <param name="categoryId">Category ID</param>
-    /// <param name="pageNumber">Page number (default: 1)</param>
-    /// <param name="pageSize">Page size (default: 10)</param>
-    /// <returns>Paged list of products in the category</returns>
     [HttpGet("category/{categoryId:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetProductsByCategory(
-        Guid categoryId,
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetProductsByCategory(Guid categoryId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
-        var query = new GetProductsByCategoryQuery(categoryId, pageNumber, pageSize);
-        var result = await _mediator.Send(query);
-
-        if (result.IsFailure)
-            return BadRequest(new { error = result.Error.Message });
-
+        var result = await _mediator.Send(new GetProductsByCategoryQuery(categoryId, pageNumber, pageSize));
+        if (!result.IsSuccess) return BadRequest(GeneralResponse<object>.CreateFailure(result.Error.Message, 400));
         return Ok(result.Value);
     }
 
-    /// <summary>
-    /// Create a new product
-    /// </summary>
-    /// <param name="command">Product creation details</param>
-    /// <returns>Created product ID</returns>
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductCommand command)
     {
         var result = await _mediator.Send(command);
-
-        if (result.IsFailure)
-            return BadRequest(new { error = result.Error.Message });
-
-        return CreatedAtAction(
-            nameof(GetProductById),
-            new { id = result.Value },
-            new { id = result.Value });
+        if (!result.IsSuccess) return BadRequest(GeneralResponse<object>.CreateFailure(result.Error.Message, 400));
+        return StatusCode(201, result.Value);
     }
 
-    /// <summary>
-    /// Update an existing product
-    /// </summary>
-    /// <param name="id">Product ID</param>
-    /// <param name="command">Product update details</param>
-    /// <returns>Success message</returns>
     [HttpPut("{id:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] UpdateProductCommand command)
     {
-        if (id != command.ProductId)
-            return BadRequest(new { error = "Product ID mismatch" });
-
+        if (id != command.ProductId) return BadRequest(GeneralResponse<object>.CreateFailure("Product ID mismatch", 400));
         var result = await _mediator.Send(command);
-
-        if (result.IsFailure)
-            return NotFound(new { error = result.Error.Message });
-
-        return Ok(new { message = "Product updated successfully" });
+        if (!result.IsSuccess) return NotFound(GeneralResponse<object>.CreateFailure(result.Error.Message, 404));
+        return Ok(result.Value);
     }
 
-    /// <summary>
-    /// Delete a product
-    /// </summary>
-    /// <param name="id">Product ID</param>
-    /// <returns>No content on success</returns>
     [HttpDelete("{id:guid}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteProduct(Guid id)
     {
-        var command = new DeleteProductCommand(id);
-        var result = await _mediator.Send(command);
-
-        if (result.IsFailure)
-            return NotFound(new { error = result.Error.Message });
-
-        return NoContent();
+        var result = await _mediator.Send(new DeleteProductCommand(id));
+        if (!result.IsSuccess) return NotFound(GeneralResponse<object>.CreateFailure(result.Error.Message, 404));
+        return Ok(result.Value);
     }
 
-    /// <summary>
-    /// Update product price with history tracking
-    /// </summary>
-    /// <param name="id">Product ID</param>
-    /// <param name="request">New price details</param>
-    /// <returns>Success message</returns>
     [HttpPatch("{id:guid}/price")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdatePrice(Guid id, [FromBody] UpdateProductPriceRequest request)
     {
-        var command = new UpdateProductPriceCommand(id, request.NewPrice);
-        var result = await _mediator.Send(command);
-
-        if (result.IsFailure)
-            return result.Error.Code == "Product.NotFound" 
-                ? NotFound(new { error = result.Error.Message })
-                : BadRequest(new { error = result.Error.Message });
-
-        return Ok(new { message = "Product price updated successfully" });
+        var result = await _mediator.Send(new UpdateProductPriceCommand(id, request.NewPrice));
+        if (!result.IsSuccess) return result.Error.Code == "Product.NotFound" 
+            ? NotFound(GeneralResponse<object>.CreateFailure(result.Error.Message, 404))
+            : BadRequest(GeneralResponse<object>.CreateFailure(result.Error.Message, 400));
+        return Ok(result.Value);
     }
 }
 

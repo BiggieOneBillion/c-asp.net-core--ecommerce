@@ -1,13 +1,13 @@
 using Ecommerce.APPLICATION.Common.Models;
-using Ecommerce.CORE.Common;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
-using Ecommerce.CORE.ValueObjects;
 using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Products.Commands.UpdateProductPrice;
 
-public class UpdateProductPriceCommandHandler : IRequestHandler<UpdateProductPriceCommand, Result<Guid>>
+public class UpdateProductPriceCommandHandler 
+    : IRequestHandler<UpdateProductPriceCommand, Result<GeneralResponse<Unit>>>
 {
     private readonly IProductRepository _productRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -18,32 +18,30 @@ public class UpdateProductPriceCommandHandler : IRequestHandler<UpdateProductPri
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<Guid>> Handle(UpdateProductPriceCommand request, CancellationToken cancellationToken)
+    public async Task<Result<GeneralResponse<Unit>>> Handle(
+        UpdateProductPriceCommand request, 
+        CancellationToken cancellationToken)
     {
         try
         {
-            var productId = ProductId.Create(request.ProductId);
             var product = await _productRepository.GetByIdAsync(request.ProductId);
 
             if (product == null)
-            {
-                return Result.Failure<Guid>(new Error("Product.NotFound", "Product not found"));
-            }
+                return Result.Failure<GeneralResponse<Unit>>(
+                    new Error("Product.NotFound", $"Product with ID {request.ProductId} not found"));
 
             product.UpdatePrice(request.NewPrice);
 
             await _productRepository.UpdateAsync(product);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(product.Id.Id);
-        }
-        catch (DomainException ex)
-        {
-            return Result.Failure<Guid>(new Error("Product.DomainError", ex.Message));
+            return Result<GeneralResponse<Unit>>.Success(
+                GeneralResponse<Unit>.CreateSuccess(Unit.Value, "Product price updated successfully"));
         }
         catch (Exception ex)
         {
-            return Result.Failure<Guid>(new Error("Product.UpdatePriceFailed", $"Failed to update product price: {ex.Message}"));
+            return Result.Failure<GeneralResponse<Unit>>(
+                new Error("Product.PriceUpdateFailed", $"Failed to update product price: {ex.Message}"));
         }
     }
 }

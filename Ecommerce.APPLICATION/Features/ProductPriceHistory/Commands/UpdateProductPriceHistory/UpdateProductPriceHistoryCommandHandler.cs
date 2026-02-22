@@ -1,4 +1,5 @@
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.ProductPriceHistory.Commands.UpdateProductPriceHistory;
 
-public class UpdateProductPriceHistoryCommandHandler : IRequestHandler<UpdateProductPriceHistoryCommand, Result>
+public class UpdateProductPriceHistoryCommandHandler : IRequestHandler<UpdateProductPriceHistoryCommand, Result<GeneralResponse<Unit>>>
 {
     private readonly IProductPriceHistoryRepository _priceHistoryRepository;
 
@@ -15,7 +16,7 @@ public class UpdateProductPriceHistoryCommandHandler : IRequestHandler<UpdatePro
         _priceHistoryRepository = priceHistoryRepository;
     }
 
-    public async Task<Result> Handle(
+    public async Task<Result<GeneralResponse<Unit>>> Handle(
         UpdateProductPriceHistoryCommand request,
         CancellationToken cancellationToken)
     {
@@ -26,7 +27,7 @@ public class UpdateProductPriceHistoryCommandHandler : IRequestHandler<UpdatePro
 
             if (priceHistory == null)
             {
-                return Result.Failure(
+                return Result.Failure<GeneralResponse<Unit>>(
                     new Error("ProductPriceHistory.NotFound", $"Price history with ID {request.ProductPriceHistoryId} not found"));
             }
 
@@ -36,11 +37,12 @@ public class UpdateProductPriceHistoryCommandHandler : IRequestHandler<UpdatePro
 
             await _priceHistoryRepository.UpdateAsync(priceHistory);
 
-            return Result.Success();
+            return Result<GeneralResponse<Unit>>.Success(
+                GeneralResponse<Unit>.CreateSuccess(Unit.Value, "Price history updated successfully"));
         }
         catch (Exception ex)
         {
-            return Result.Failure(
+            return Result.Failure<GeneralResponse<Unit>>(
                 new Error("ProductPriceHistory.UpdateFailed", $"Failed to update price history: {ex.Message}"));
         }
     }

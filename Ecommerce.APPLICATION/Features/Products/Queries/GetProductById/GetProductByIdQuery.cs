@@ -4,4 +4,8 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Products.Queries.GetProductById;
 
-public record GetProductByIdQuery(Guid ProductId) : IRequest<Result<ProductResponseDTO>>;
+/// <summary>
+/// Query to get a product by its unique identifier
+/// </summary>
+/// <param name="Id">Product ID</param>
+public record GetProductByIdQuery(Guid Id) : IRequest<Result<GeneralResponse<ProductResponseDTO>>>;

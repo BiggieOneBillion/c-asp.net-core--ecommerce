@@ -1,4 +1,6 @@
-using Ecommerce.APPLICATION.Common.Interfaces;
+using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
+using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.ProductPriceHistory.Commands.UpdateProductPriceHistory;
 
@@ -9,4 +11,4 @@ public record UpdateProductPriceHistoryCommand(
     decimal OldPrice,
     DateTime EffectiveDate,
     DateTime ChangedAt
-) : ICommand;
+) : IRequest<Result<GeneralResponse<Unit>>>;

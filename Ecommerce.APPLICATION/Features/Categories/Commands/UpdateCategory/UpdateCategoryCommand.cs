@@ -1,13 +1,15 @@
-using Ecommerce.CORE.Constants;
-using Ecommerce.APPLICATION.Common.Security;
-using Ecommerce.APPLICATION.Common.Interfaces;
+using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
+using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Categories.Commands.UpdateCategory;
 
-[HasPermission(Permissions.Categories.Update)]
+/// <summary>
+/// Command to update an existing category's information
+/// </summary>
 public record UpdateCategoryCommand(
     Guid CategoryId,
-    string CategoryName,
-    string CategoryDescription,
-    bool ActiveStatus
-) : ICommand;
+    string Name,
+    string Description,
+    Guid? ParentCategoryId
+) : IRequest<Result<GeneralResponse<Unit>>>;

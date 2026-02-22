@@ -1,6 +1,8 @@
 using Ecommerce.CORE.Constants;
 using Ecommerce.APPLICATION.Common.Security;
-using Ecommerce.APPLICATION.Common.Interfaces;
+using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
+using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Inventory.Commands.UpdateInventory;
 
@@ -10,4 +12,4 @@ public record UpdateInventoryCommand(
     Guid ProductId,
     int StockQuantity,
     int ReservedQuantity
-) : ICommand;
+) : IRequest<Result<GeneralResponse<Unit>>>;

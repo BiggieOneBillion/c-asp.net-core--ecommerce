@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Inventory.Queries.GetInventoryByProduct;
 
-public class GetInventoryByProductQueryHandler : IRequestHandler<GetInventoryByProductQuery, Result<InventoryResponseDTO>>
+public class GetInventoryByProductQueryHandler : IRequestHandler<GetInventoryByProductQuery, Result<GeneralResponse<InventoryResponseDTO>>>
 {
     private readonly IInventoryRepository _inventoryRepository;
     private readonly IMapper _mapper;
@@ -21,7 +21,7 @@ public class GetInventoryByProductQueryHandler : IRequestHandler<GetInventoryByP
         _mapper = mapper;
     }
 
-    public async Task<Result<InventoryResponseDTO>> Handle(
+    public async Task<Result<GeneralResponse<InventoryResponseDTO>>> Handle(
         GetInventoryByProductQuery request,
         CancellationToken cancellationToken)
     {
@@ -32,17 +32,18 @@ public class GetInventoryByProductQueryHandler : IRequestHandler<GetInventoryByP
 
             if (inventory == null)
             {
-                return Result.Failure<InventoryResponseDTO>(
+                return Result.Failure<GeneralResponse<InventoryResponseDTO>>(
                     new Error("Inventory.NotFound", $"Inventory for product {request.ProductId} not found"));
             }
 
             var inventoryDto = _mapper.Map<InventoryResponseDTO>(inventory);
 
-            return Result.Success(inventoryDto);
+            return Result<GeneralResponse<InventoryResponseDTO>>.Success(
+                GeneralResponse<InventoryResponseDTO>.CreateSuccess(inventoryDto));
         }
         catch (Exception ex)
         {
-            return Result.Failure<InventoryResponseDTO>(
+            return Result.Failure<GeneralResponse<InventoryResponseDTO>>(
                 new Error("Inventory.QueryFailed", $"Failed to retrieve inventory: {ex.Message}"));
         }
     }

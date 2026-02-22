@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Inventory.Queries.GetInventoryByProduct;
 
-public record GetInventoryByProductQuery(Guid ProductId) : IRequest<Result<InventoryResponseDTO>>;
+public record GetInventoryByProductQuery(Guid ProductId) : IRequest<Result<GeneralResponse<InventoryResponseDTO>>>;

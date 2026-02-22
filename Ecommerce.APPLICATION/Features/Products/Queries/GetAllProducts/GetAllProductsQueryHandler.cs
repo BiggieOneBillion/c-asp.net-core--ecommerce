@@ -8,7 +8,7 @@ using MediatR;
 namespace Ecommerce.APPLICATION.Features.Products.Queries.GetAllProducts;
 
 public class GetAllProductsQueryHandler 
-    : IRequestHandler<GetAllProductsQuery, Result<PagedResult<ProductResponseDTO>>>
+    : IRequestHandler<GetAllProductsQuery, Result<GeneralResponse<PagedResult<ProductResponseDTO>>>>
 {
     private readonly IProductRepository _productRepository;
     private readonly IDiscountService _discountService;
@@ -24,7 +24,7 @@ public class GetAllProductsQueryHandler
         _mapper = mapper;
     }
 
-    public async Task<Result<PagedResult<ProductResponseDTO>>> Handle(
+    public async Task<Result<GeneralResponse<PagedResult<ProductResponseDTO>>>> Handle(
         GetAllProductsQuery request,
         CancellationToken cancellationToken)
     {
@@ -32,11 +32,11 @@ public class GetAllProductsQueryHandler
         {
             var products = (await _productRepository.GetAllAsync()).ToList();
 
-            if (products == null)
-                return Result.Failure<PagedResult<ProductResponseDTO>>(
-                    new Error("Product.NotFound", "No products found"));
-
-            
+            if (products == null || !products.Any())
+                return Result<GeneralResponse<PagedResult<ProductResponseDTO>>>.Success(
+                    GeneralResponse<PagedResult<ProductResponseDTO>>.CreateSuccess(
+                        new PagedResult<ProductResponseDTO>(new List<ProductResponseDTO>(), request.PageNumber, request.PageSize, 0),
+                        "No products found"));
 
             // Calculate pagination
             var totalCount = products.Count;
@@ -54,10 +54,11 @@ public class GetAllProductsQueryHandler
                 // Calculate auto-discounts
                 var discountItems = new List<(Guid ProductId, Guid CategoryId, decimal Price, int Quantity)>
                 {
-                    (Guid.Parse(product.Id.Value()), Guid.Parse(product.CategoryId.Value()), product.CurrentPrice, 1)
+                    (product.Id.Id, product.CategoryId.Id, product.CurrentPrice, 1)
                 };
 
-                var (discountAmount, _) = await _discountService.CalculateDiscountAsync(null, product.CurrentPrice, discountItems);
+                var discountResult = await _discountService.CalculateDiscountAsync(null, product.CurrentPrice, discountItems);
+                var discountAmount = discountResult.DiscountAmount;
 
                 if (discountAmount > 0)
                 {
@@ -80,11 +81,12 @@ public class GetAllProductsQueryHandler
                 request.PageSize,
                 totalCount);
 
-            return Result.Success(pagedResult);
+            return Result<GeneralResponse<PagedResult<ProductResponseDTO>>>.Success(
+                GeneralResponse<PagedResult<ProductResponseDTO>>.CreateSuccess(pagedResult));
         }
         catch (Exception ex)
         {
-            return Result.Failure<PagedResult<ProductResponseDTO>>(
+            return Result.Failure<GeneralResponse<PagedResult<ProductResponseDTO>>>(
                 new Error("Product.QueryFailed", $"Failed to retrieve products: {ex.Message}"));
         }
     }

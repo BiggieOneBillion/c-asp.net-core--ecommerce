@@ -1,4 +1,7 @@
 using Ecommerce.APPLICATION.Common.Interfaces;
+using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
+using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.ProductPriceHistory.Commands.CreateProductPriceHistory;
 
@@ -8,4 +11,4 @@ public record CreateProductPriceHistoryCommand(
     decimal OldPrice,
     DateTime EffectiveDate,
     DateTime ChangedAt
-) : ICommand<Guid>;
+) : IRequest<Result<GeneralResponse<Guid>>>;

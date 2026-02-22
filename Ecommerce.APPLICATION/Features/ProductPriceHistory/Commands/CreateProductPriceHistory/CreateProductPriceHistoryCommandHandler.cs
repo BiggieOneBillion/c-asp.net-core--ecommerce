@@ -1,4 +1,5 @@
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.ProductPriceHistory.Commands.CreateProductPriceHistory;
 
-public class CreateProductPriceHistoryCommandHandler : IRequestHandler<CreateProductPriceHistoryCommand, Result<Guid>>
+public class CreateProductPriceHistoryCommandHandler : IRequestHandler<CreateProductPriceHistoryCommand, Result<GeneralResponse<Guid>>>
 {
     private readonly IProductPriceHistoryRepository _priceHistoryRepository;
 
@@ -15,13 +16,12 @@ public class CreateProductPriceHistoryCommandHandler : IRequestHandler<CreatePro
         _priceHistoryRepository = priceHistoryRepository;
     }
 
-    public async Task<Result<Guid>> Handle(
+    public async Task<Result<GeneralResponse<Guid>>> Handle(
         CreateProductPriceHistoryCommand request,
         CancellationToken cancellationToken)
     {
         try
         {
-            var priceHistoryId = Guid.NewGuid();
             var productId = ProductId.Create(request.ProductId);
 
             var priceHistory = new CORE.Entity.ProductPriceHistory(
@@ -33,11 +33,12 @@ public class CreateProductPriceHistoryCommandHandler : IRequestHandler<CreatePro
 
             await _priceHistoryRepository.CreateAsync(priceHistory);
 
-            return Result.Success(priceHistoryId);
+            return Result<GeneralResponse<Guid>>.Success(
+                GeneralResponse<Guid>.CreateSuccess(priceHistory.Id.Id, "Price history created successfully", 201));
         }
         catch (Exception ex)
         {
-            return Result.Failure<Guid>(
+            return Result.Failure<GeneralResponse<Guid>>(
                 new Error("ProductPriceHistory.CreateFailed", $"Failed to create price history: {ex.Message}"));
         }
     }

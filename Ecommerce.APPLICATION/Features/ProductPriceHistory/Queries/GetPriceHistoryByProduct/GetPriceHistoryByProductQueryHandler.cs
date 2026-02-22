@@ -9,7 +9,7 @@ using MediatR;
 namespace Ecommerce.APPLICATION.Features.ProductPriceHistory.Queries.GetPriceHistoryByProduct;
 
 public class GetPriceHistoryByProductQueryHandler 
-    : IRequestHandler<GetPriceHistoryByProductQuery, Result<PagedResult<ProductPriceHistoryResponseDTO>>>
+    : IRequestHandler<GetPriceHistoryByProductQuery, Result<GeneralResponse<PagedResult<ProductPriceHistoryResponseDTO>>>>
 {
     private readonly IProductPriceHistoryRepository _priceHistoryRepository;
     private readonly IMapper _mapper;
@@ -22,7 +22,7 @@ public class GetPriceHistoryByProductQueryHandler
         _mapper = mapper;
     }
 
-    public async Task<Result<PagedResult<ProductPriceHistoryResponseDTO>>> Handle(
+    public async Task<Result<GeneralResponse<PagedResult<ProductPriceHistoryResponseDTO>>>> Handle(
         GetPriceHistoryByProductQuery request,
         CancellationToken cancellationToken)
     {
@@ -30,6 +30,12 @@ public class GetPriceHistoryByProductQueryHandler
         {
             var productId = ProductId.Create(request.ProductId);
             var priceHistories = (await _priceHistoryRepository.GetByProductIdAsync(productId.Id)).ToList();
+
+            if (priceHistories == null || !priceHistories.Any())
+                return Result<GeneralResponse<PagedResult<ProductPriceHistoryResponseDTO>>>.Success(
+                    GeneralResponse<PagedResult<ProductPriceHistoryResponseDTO>>.CreateSuccess(
+                        new PagedResult<ProductPriceHistoryResponseDTO>(new List<ProductPriceHistoryResponseDTO>(), request.PageNumber, request.PageSize, 0),
+                        "No price history found for this product"));
 
             // Calculate pagination
             var totalCount = priceHistories.Count;
@@ -47,11 +53,12 @@ public class GetPriceHistoryByProductQueryHandler
                 request.PageSize,
                 totalCount);
 
-            return Result.Success(pagedResult);
+            return Result<GeneralResponse<PagedResult<ProductPriceHistoryResponseDTO>>>.Success(
+                GeneralResponse<PagedResult<ProductPriceHistoryResponseDTO>>.CreateSuccess(pagedResult));
         }
         catch (Exception ex)
         {
-            return Result.Failure<PagedResult<ProductPriceHistoryResponseDTO>>(
+            return Result.Failure<GeneralResponse<PagedResult<ProductPriceHistoryResponseDTO>>>(
                 new Error("ProductPriceHistory.QueryFailed", $"Failed to retrieve price history: {ex.Message}"));
         }
     }

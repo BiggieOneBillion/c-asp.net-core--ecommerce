@@ -1,5 +1,5 @@
-using AutoMapper;
 using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using Ecommerce.CORE.ValueObjects;
@@ -7,43 +7,40 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Categories.Commands.CreateCategory;
 
-public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, Result<Guid>>
+public class CreateCategoryCommandHandler 
+    : IRequestHandler<CreateCategoryCommand, Result<GeneralResponse<Guid>>>
 {
     private readonly ICategoryRepository _categoryRepository;
-
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
 
-    public CreateCategoryCommandHandler(
-        ICategoryRepository categoryRepository,
-        IUnitOfWork unitOfWork,
-        IMapper mapper)
+    public CreateCategoryCommandHandler(ICategoryRepository categoryRepository, IUnitOfWork unitOfWork)
     {
         _categoryRepository = categoryRepository;
         _unitOfWork = unitOfWork;
-        _mapper = mapper;
     }
 
-    public async Task<Result<Guid>> Handle(
-        CreateCategoryCommand request,
+    public async Task<Result<GeneralResponse<Guid>>> Handle(
+        CreateCategoryCommand request, 
         CancellationToken cancellationToken)
     {
         try
         {
+            // Note: ParentCategoryId is not supported by the current Category entity
             var category = Category.Create(
-                request.CategoryName,
-                request.CategoryDescription,
-                request.ActiveStatus);
+                request.Name,
+                request.Description,
+                activeStatus: true
+            );
 
             await _categoryRepository.CreateAsync(category);
-
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(category.Id.Id);
+            return Result<GeneralResponse<Guid>>.Success(
+                GeneralResponse<Guid>.CreateSuccess(category.Id.Id, "Category created successfully", 201));
         }
         catch (Exception ex)
         {
-            return Result.Failure<Guid>(
+            return Result.Failure<GeneralResponse<Guid>>(
                 new Error("Category.CreateFailed", $"Failed to create category: {ex.Message}"));
         }
     }

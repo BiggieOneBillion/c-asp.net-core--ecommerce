@@ -9,7 +9,7 @@ using MediatR;
 namespace Ecommerce.APPLICATION.Features.InventoryMovement.Queries.GetInventoryMovementsByProduct;
 
 public class GetInventoryMovementsByProductQueryHandler 
-    : IRequestHandler<GetInventoryMovementsByProductQuery, Result<PagedResult<InventoryMovementResponseDTO>>>
+    : IRequestHandler<GetInventoryMovementsByProductQuery, Result<GeneralResponse<PagedResult<InventoryMovementResponseDTO>>>>
 {
     private readonly IInventoryMovementRepository _inventoryMovementRepository;
     private readonly IMapper _mapper;
@@ -22,7 +22,7 @@ public class GetInventoryMovementsByProductQueryHandler
         _mapper = mapper;
     }
 
-    public async Task<Result<PagedResult<InventoryMovementResponseDTO>>> Handle(
+    public async Task<Result<GeneralResponse<PagedResult<InventoryMovementResponseDTO>>>> Handle(
         GetInventoryMovementsByProductQuery request,
         CancellationToken cancellationToken)
     {
@@ -30,6 +30,12 @@ public class GetInventoryMovementsByProductQueryHandler
         {
             var productId = ProductId.Create(request.ProductId);
             var movements = (await _inventoryMovementRepository.GetByProductIdAsync(productId.Id)).ToList();
+
+            if (movements == null || !movements.Any())
+                return Result<GeneralResponse<PagedResult<InventoryMovementResponseDTO>>>.Success(
+                    GeneralResponse<PagedResult<InventoryMovementResponseDTO>>.CreateSuccess(
+                        new PagedResult<InventoryMovementResponseDTO>(new List<InventoryMovementResponseDTO>(), request.PageNumber, request.PageSize, 0),
+                        "No inventory movements found for this product"));
 
             // Calculate pagination
             var totalCount = movements.Count;
@@ -47,11 +53,12 @@ public class GetInventoryMovementsByProductQueryHandler
                 request.PageSize,
                 totalCount);
 
-            return Result.Success(pagedResult);
+            return Result<GeneralResponse<PagedResult<InventoryMovementResponseDTO>>>.Success(
+                GeneralResponse<PagedResult<InventoryMovementResponseDTO>>.CreateSuccess(pagedResult));
         }
         catch (Exception ex)
         {
-            return Result.Failure<PagedResult<InventoryMovementResponseDTO>>(
+            return Result.Failure<GeneralResponse<PagedResult<InventoryMovementResponseDTO>>>(
                 new Error("InventoryMovement.QueryFailed", $"Failed to retrieve inventory movements: {ex.Message}"));
         }
     }

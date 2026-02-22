@@ -1,20 +1,18 @@
-using Ecommerce.CORE.Constants;
-using Ecommerce.APPLICATION.Common.Security;
-using Ecommerce.APPLICATION.Common.Interfaces;
+using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
+using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Products.Commands.UpdateProduct;
 
 /// <summary>
-/// Command to update an existing product
+/// Command to update an existing product's basic information
 /// </summary>
-/// <param name="ProductId">Unique identifier of the product to update</param>
-/// <param name="Name">Updated name of the product</param>
-/// <param name="Description">Updated description of the product</param>
-/// <param name="CategoryId">Unique identifier of the updated category</param>
-[HasPermission(Permissions.Products.Update)]
 public record UpdateProductCommand(
     Guid ProductId,
     string Name,
     string Description,
-    Guid CategoryId
-) : ICommand;
+    int StockQuantity,
+    Guid CategoryId,
+    string? ImageUrl,
+    bool IsActive
+) : IRequest<Result<GeneralResponse<Unit>>>;

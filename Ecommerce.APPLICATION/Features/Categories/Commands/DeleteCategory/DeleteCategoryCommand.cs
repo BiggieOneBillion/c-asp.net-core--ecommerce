@@ -1,8 +1,11 @@
-using Ecommerce.CORE.Constants;
-using Ecommerce.APPLICATION.Common.Security;
-using Ecommerce.APPLICATION.Common.Interfaces;
+using Ecommerce.APPLICATION.Common.Models;
+using Ecommerce.APPLICATION.ResponseDTOs;
+using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Categories.Commands.DeleteCategory;
 
-[HasPermission(Permissions.Categories.Delete)]
-public record DeleteCategoryCommand(Guid CategoryId) : ICommand;
+/// <summary>
+/// Command to delete a category
+/// </summary>
+/// <param name="Id">Category ID</param>
+public record DeleteCategoryCommand(Guid Id) : IRequest<Result<GeneralResponse<Unit>>>;

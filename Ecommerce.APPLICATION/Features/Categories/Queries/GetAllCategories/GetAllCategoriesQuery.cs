@@ -1,11 +1,10 @@
-using Ecommerce.APPLICATION.Common.Interfaces;
 using Ecommerce.APPLICATION.Common.Models;
 using Ecommerce.APPLICATION.ResponseDTOs;
+using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Categories.Queries.GetAllCategories;
 
-public record GetAllCategoriesQuery(
-    int PageNumber = 1,
-    int PageSize = 10,
-    bool? ActiveOnly = null
-) : IQuery<PagedResult<CategoryResponseDTO>>;
+/// <summary>
+/// Query to retrieve all product categories
+/// </summary>
+public record GetAllCategoriesQuery() : IRequest<Result<GeneralResponse<List<CategoryResponseDTO>>>>;

@@ -9,4 +9,4 @@ public record GetPriceHistoryByProductQuery(
     Guid ProductId,
     int PageNumber = 1,
     int PageSize = 10
-) : IRequest<Result<PagedResult<ProductPriceHistoryResponseDTO>>>;
+) : IRequest<Result<GeneralResponse<PagedResult<ProductPriceHistoryResponseDTO>>>>;

@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Ecommerce.APPLICATION.Features.Auth.Commands.VerifyEmail;
 
-public record VerifyEmailCommand(string Token) : IRequest<Result<Unit>>;
+public record VerifyEmailCommand(string Token, string Email) : IRequest<Result<Unit>>;

@@ -52,9 +52,9 @@ public class UserRepository : IUserRepository
         await CreateAsync(entity);
     }
 
-    public async Task<Users?> GetUserByVerificationTokenAsync(string token)
+    public async Task<Users?> GetUserByVerificationTokenAsync(string token, string email)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.EmailVerificationToken == token);
+        return await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.EmailVerificationToken == token);
     }
 
     public async Task<Users?> GetUserByPasswordResetTokenAsync(string token)

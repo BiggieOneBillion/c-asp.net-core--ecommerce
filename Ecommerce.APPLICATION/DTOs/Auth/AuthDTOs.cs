@@ -37,6 +37,10 @@ public record AuthResponse(
     string Email,
     string Role);
 
+public record RegisterationResponse(
+    string Message
+)
+
 /// <summary>
 /// Request model for refreshing an expired access token
 /// </summary>
@@ -67,4 +71,4 @@ public record ResetPasswordRequest(
 /// </summary>
 /// <param name="Token">The verification token sent to the user's email</param>
 public record VerifyEmailRequest(
-    string Token);
+    string Token, string Email);

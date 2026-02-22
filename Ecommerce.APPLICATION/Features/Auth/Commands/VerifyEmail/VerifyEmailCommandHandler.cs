@@ -17,7 +17,8 @@ public class VerifyEmailCommandHandler : IRequestHandler<VerifyEmailCommand, Res
 
     public async Task<Result<Unit>> Handle(VerifyEmailCommand command, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.GetUserByVerificationTokenAsync(command.Token);
+        
+        var user = await _userRepository.GetUserByVerificationTokenAsync(command.Token, command.Email);
         if (user == null)
         {
             return Result.Failure<Unit>(new Error("400", "Invalid or expired verification token."));

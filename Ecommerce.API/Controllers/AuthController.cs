@@ -141,7 +141,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
     {
-        var result = await _mediator.Send(new VerifyEmailCommand(request.Token));
+        var result = await _mediator.Send(new VerifyEmailCommand(request.Token, request.Email));
         if (!result.IsSuccess) return BadRequest(result.Error);
         return Ok(new { message = "Email verified successfully." });
     }

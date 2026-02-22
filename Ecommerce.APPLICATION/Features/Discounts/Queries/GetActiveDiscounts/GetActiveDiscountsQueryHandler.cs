@@ -22,6 +22,11 @@ public class GetActiveDiscountsQueryHandler : IRequestHandler<GetActiveDiscounts
         try
         {
             var activeDiscounts = await _discountRepository.GetActiveDiscountsAsync();
+
+            if (activeDiscounts == null)
+            {
+                return Result.Failure<List<DiscountResponseDTO>>(new Error("Discount.QueryFailed", $"No active discounts"));
+            }
             var discountDtos = _mapper.Map<List<DiscountResponseDTO>>(activeDiscounts);
             return Result.Success(discountDtos);
         }

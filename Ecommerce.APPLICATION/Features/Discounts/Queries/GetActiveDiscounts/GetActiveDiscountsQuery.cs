@@ -7,4 +7,4 @@ using MediatR;
 namespace Ecommerce.APPLICATION.Features.Discounts.Queries.GetActiveDiscounts;
 
 [HasPermission(Permissions.Discounts.View)]
-public record GetActiveDiscountsQuery() : IRequest<Result<List<DiscountResponseDTO>>>;
+public record GetActiveDiscountsQuery(int page = 1) : IRequest<Result<List<DiscountResponseDTO>>>;

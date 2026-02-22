@@ -37,7 +37,14 @@ public class DiscountsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetActive()
     {
-        var result = await _mediator.Send(new GetActiveDiscountsQuery());
+        var query = new GetActiveDiscountsQuery(page: 1);
+        var result = await _mediator.Send(query);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(new { error = result.Error.Message });
+        }
+
         return Ok(result.Value);
     }
 

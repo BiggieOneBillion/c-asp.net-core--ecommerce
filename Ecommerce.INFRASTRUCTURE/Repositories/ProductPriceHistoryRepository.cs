@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
+using Ecommerce.CORE.ValueObjects;
 using Ecommerce.INFRASTRUCTURE.Data; // Assuming ApplicationDbContext is in this namespace
 using Microsoft.EntityFrameworkCore; // Required for EF Core methods
 
@@ -31,7 +32,8 @@ namespace Ecommerce.INFRASTRUCTURE.Repositories
 
         public async Task<ProductPriceHistory?> GetByIdAsync(Guid id)
         {
-            return await _context.ProductPriceHistories.FirstOrDefaultAsync(p => p.Id.Id == id);
+            var historyId = ProductPriceHistoryId.Create(id);
+            return await _context.ProductPriceHistories.FirstOrDefaultAsync(p => p.Id == historyId);
         }
 
         public async Task<IEnumerable<ProductPriceHistory>> GetAllAsync()
@@ -41,8 +43,9 @@ namespace Ecommerce.INFRASTRUCTURE.Repositories
 
         public async Task<IEnumerable<ProductPriceHistory>> GetByProductIdAsync(Guid productId)
         {
+            var prodId = ProductId.Create(productId);
             return await _context.ProductPriceHistories
-                .Where(p => p.ProductId.Id == productId)
+                .Where(p => p.ProductId == prodId)
                 .ToListAsync();
         }
 

@@ -2,14 +2,9 @@ using System;
 
 namespace Ecommerce.CORE.ValueObjects;
 
-public class CategoryId
+public record CategoryId(Guid Id)
 {
-   public Guid Id { get; set; }
+    public string Value() => Id.ToString();
 
-   public string Value () => Id.ToString();
-
-   public static CategoryId Create(Guid id)
-   {
-      return new CategoryId { Id = id };
-   }
+    public static CategoryId Create(Guid id) => new(id);
 }

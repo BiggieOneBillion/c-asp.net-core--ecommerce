@@ -1,6 +1,7 @@
 using System;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
+using Ecommerce.CORE.ValueObjects;
 using Ecommerce.INFRASTRUCTURE.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,7 +29,8 @@ public class OrderItemsRepository : IOrderItemsRepository
 
     public async Task<OrderItems?> GetByIdAsync(Guid id)
     {
-        return await _context.OrderItems.FirstOrDefaultAsync(o => o.Id.Id == id);
+        var orderItemId = OrderItemsId.Create(id);
+        return await _context.OrderItems.FirstOrDefaultAsync(o => o.Id == orderItemId);
     }
 
     public async Task<IEnumerable<OrderItems>> GetAllAsync()
@@ -38,8 +40,9 @@ public class OrderItemsRepository : IOrderItemsRepository
 
     public async Task<IEnumerable<OrderItems>> GetByOrderIdAsync(Guid orderId)
     {
+        var ordId = OrderId.Create(orderId);
         return await _context.OrderItems
-            .Where(o => o.OrderId.Id == orderId)
+            .Where(o => o.OrderId == ordId)
             .ToListAsync();
     }
 

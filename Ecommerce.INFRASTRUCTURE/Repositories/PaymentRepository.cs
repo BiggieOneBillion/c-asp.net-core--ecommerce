@@ -1,6 +1,7 @@
 using System;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
+using Ecommerce.CORE.ValueObjects;
 using Ecommerce.INFRASTRUCTURE.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,7 +29,8 @@ public class PaymentRepository : IPaymentRepository
 
     public async Task<Payment?> GetByIdAsync(Guid id)
     {
-        return await _context.Payments.FirstOrDefaultAsync(p => p.Id.Id == id);
+        var paymentId = PaymentId.Create(id);
+        return await _context.Payments.FirstOrDefaultAsync(p => p.Id == paymentId);
     }
 
     public async Task<IEnumerable<Payment>> GetAllAsync()
@@ -38,8 +40,9 @@ public class PaymentRepository : IPaymentRepository
 
     public async Task<IEnumerable<Payment>> GetByOrderIdAsync(Guid orderId)
     {
+        var ordId = OrderId.Create(orderId);
         return await _context.Payments
-            .Where(p => p.OrderId.Id == orderId)
+            .Where(p => p.OrderId == ordId)
             .ToListAsync();
     }
 

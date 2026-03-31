@@ -1,6 +1,7 @@
 using System;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
+using Ecommerce.CORE.ValueObjects;
 using Ecommerce.INFRASTRUCTURE.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,7 +29,8 @@ public class InventoryRepository : IInventoryRepository
 
     public async Task<Inventory?> GetByIdAsync(Guid id)
     {
-        return await _context.Inventories.FirstOrDefaultAsync(i => i.Id.Id == id);
+        var inventoryId = InventoryId.Create(id);
+        return await _context.Inventories.FirstOrDefaultAsync(i => i.Id == inventoryId);
     }
 
     public async Task<IEnumerable<Inventory>> GetAllAsync()

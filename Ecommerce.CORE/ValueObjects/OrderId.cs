@@ -2,14 +2,9 @@ using System;
 
 namespace Ecommerce.CORE.ValueObjects;
 
-public class OrderId
+public record OrderId(Guid Id)
 {
- public Guid Id { get; set; }
+    public string Value() => Id.ToString();
 
-   public string Value () => Id.ToString();
-
-   public static OrderId Create(Guid id)
-   {
-      return new OrderId { Id = id };
-   }
+    public static OrderId Create(Guid id) => new(id);
 }

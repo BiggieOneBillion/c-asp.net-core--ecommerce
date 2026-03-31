@@ -2,14 +2,9 @@ using System;
 
 namespace Ecommerce.CORE.ValueObjects;
 
-public class InventoryId
-{ 
-   public Guid Id { get; set; }
+public record InventoryId(Guid Id)
+{
+    public string Value() => Id.ToString();
 
-     public string Value () => Id.ToString();
-
-   public static InventoryId Create(Guid id)
-   {
-      return new InventoryId { Id = id };
-   }
+    public static InventoryId Create(Guid id) => new(id);
 }

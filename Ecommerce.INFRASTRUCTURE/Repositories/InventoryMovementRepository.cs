@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
+using Ecommerce.CORE.ValueObjects;
 using Ecommerce.INFRASTRUCTURE.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,7 +32,8 @@ namespace Ecommerce.INFRASTRUCTURE.Repositories
 
         public async Task<InventoryMovement?> GetByIdAsync(Guid id)
         {
-            return await _context.InventoryMovements.FirstOrDefaultAsync(i => i.Id.Id == id);
+            var movementId = InventoryMovementId.Create(id);
+            return await _context.InventoryMovements.FirstOrDefaultAsync(i => i.Id == movementId);
         }
 
         public async Task<IEnumerable<InventoryMovement>> GetAllAsync()
@@ -41,8 +43,9 @@ namespace Ecommerce.INFRASTRUCTURE.Repositories
 
         public async Task<IEnumerable<InventoryMovement>> GetByProductIdAsync(Guid productId)
         {
+            var prodId = ProductId.Create(productId);
             return await _context.InventoryMovements
-                .Where(i => i.ProductId.Id == productId)
+                .Where(i => i.ProductId == prodId)
                 .ToListAsync();
         }
 

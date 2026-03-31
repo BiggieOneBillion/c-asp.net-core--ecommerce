@@ -40,7 +40,10 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
                     v => v.Id,
                     v => CategoryId.Create(v))
                 .IsRequired();
-            
+
+            builder.Property(p => p.ImageUrl)
+                .HasMaxLength(500);
+
             // Relationships
             builder.HasOne<Category>()
                 .WithMany()

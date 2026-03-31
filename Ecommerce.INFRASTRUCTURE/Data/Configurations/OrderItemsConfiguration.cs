@@ -42,7 +42,7 @@ namespace Ecommerce.INFRASTRUCTURE.Data.Configurations
 
             // Relationships
             builder.HasOne<Order>()
-                .WithMany()
+                .WithMany(o => o.OrderItems)
                 .HasForeignKey(x => x.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 

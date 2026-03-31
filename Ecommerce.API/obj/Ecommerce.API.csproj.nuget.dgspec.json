@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.API/Ecommerce.API.csproj": {}
+    "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.API/Ecommerce.API.csproj": {}
   },
   "projects": {
-    "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.API/Ecommerce.API.csproj": {
+    "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.API/Ecommerce.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.API/Ecommerce.API.csproj",
+        "projectUniqueName": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.API/Ecommerce.API.csproj",
         "projectName": "Ecommerce.API",
-        "projectPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.API/Ecommerce.API.csproj",
+        "projectPath": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.API/Ecommerce.API.csproj",
         "packagesPath": "/Users/chukwuchinwendu/.nuget/packages/",
-        "outputPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.API/obj/",
+        "outputPath": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.API/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/chukwuchinwendu/.nuget/NuGet/NuGet.Config"
@@ -27,14 +27,14 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.APPLICATION/Ecommerce.APPLICATION.csproj": {
-                "projectPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.APPLICATION/Ecommerce.APPLICATION.csproj"
+              "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.APPLICATION/Ecommerce.APPLICATION.csproj": {
+                "projectPath": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.APPLICATION/Ecommerce.APPLICATION.csproj"
               },
-              "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj": {
-                "projectPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj"
+              "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj": {
+                "projectPath": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj"
               },
-              "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.INFRASTRUCTURE/Ecommerce.INFRASTRUCTURE.csproj": {
-                "projectPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.INFRASTRUCTURE/Ecommerce.INFRASTRUCTURE.csproj"
+              "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.INFRASTRUCTURE/Ecommerce.INFRASTRUCTURE.csproj": {
+                "projectPath": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.INFRASTRUCTURE/Ecommerce.INFRASTRUCTURE.csproj"
               }
             }
           }
@@ -55,6 +55,10 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "FluentValidation.AspNetCore": {
+              "target": "Package",
+              "version": "[11.3.1, )"
+            },
             "MediatR": {
               "target": "Package",
               "version": "[13.1.0, )"
@@ -78,6 +82,10 @@
               "version": "[9.0.1, )"
             },
             "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[7.2.0, )"
+            },
+            "Swashbuckle.AspNetCore.Annotations": {
               "target": "Package",
               "version": "[7.2.0, )"
             }
@@ -105,14 +113,14 @@
         }
       }
     },
-    "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.APPLICATION/Ecommerce.APPLICATION.csproj": {
+    "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.APPLICATION/Ecommerce.APPLICATION.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.APPLICATION/Ecommerce.APPLICATION.csproj",
+        "projectUniqueName": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.APPLICATION/Ecommerce.APPLICATION.csproj",
         "projectName": "Ecommerce.APPLICATION",
-        "projectPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.APPLICATION/Ecommerce.APPLICATION.csproj",
+        "projectPath": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.APPLICATION/Ecommerce.APPLICATION.csproj",
         "packagesPath": "/Users/chukwuchinwendu/.nuget/packages/",
-        "outputPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.APPLICATION/obj/",
+        "outputPath": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.APPLICATION/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/chukwuchinwendu/.nuget/NuGet/NuGet.Config"
@@ -128,8 +136,8 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj": {
-                "projectPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj"
+              "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj": {
+                "projectPath": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj"
               }
             }
           }
@@ -203,14 +211,14 @@
         }
       }
     },
-    "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj": {
+    "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj",
+        "projectUniqueName": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj",
         "projectName": "Ecommerce.CORE",
-        "projectPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj",
+        "projectPath": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj",
         "packagesPath": "/Users/chukwuchinwendu/.nuget/packages/",
-        "outputPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.CORE/obj/",
+        "outputPath": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.CORE/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/chukwuchinwendu/.nuget/NuGet/NuGet.Config"
@@ -269,14 +277,14 @@
         }
       }
     },
-    "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.INFRASTRUCTURE/Ecommerce.INFRASTRUCTURE.csproj": {
+    "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.INFRASTRUCTURE/Ecommerce.INFRASTRUCTURE.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.INFRASTRUCTURE/Ecommerce.INFRASTRUCTURE.csproj",
+        "projectUniqueName": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.INFRASTRUCTURE/Ecommerce.INFRASTRUCTURE.csproj",
         "projectName": "Ecommerce.INFRASTRUCTURE",
-        "projectPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.INFRASTRUCTURE/Ecommerce.INFRASTRUCTURE.csproj",
+        "projectPath": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.INFRASTRUCTURE/Ecommerce.INFRASTRUCTURE.csproj",
         "packagesPath": "/Users/chukwuchinwendu/.nuget/packages/",
-        "outputPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.INFRASTRUCTURE/obj/",
+        "outputPath": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.INFRASTRUCTURE/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/chukwuchinwendu/.nuget/NuGet/NuGet.Config"
@@ -292,11 +300,11 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.APPLICATION/Ecommerce.APPLICATION.csproj": {
-                "projectPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.APPLICATION/Ecommerce.APPLICATION.csproj"
+              "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.APPLICATION/Ecommerce.APPLICATION.csproj": {
+                "projectPath": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.APPLICATION/Ecommerce.APPLICATION.csproj"
               },
-              "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj": {
-                "projectPath": "/Users/chukwuchinwendu/Desktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj"
+              "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj": {
+                "projectPath": "/Users/chukwuchinwendu/Desktop/MainDesktop/C# Ecommerce/Ecommerce.CORE/Ecommerce.CORE.csproj"
               }
             }
           }

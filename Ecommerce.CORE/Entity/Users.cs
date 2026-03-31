@@ -3,9 +3,11 @@ using Ecommerce.CORE.ValueObjects;
 using Ecommerce.CORE.Enums;
 using System.Collections.Generic;
 
+using Ecommerce.CORE.Common;
+
 namespace Ecommerce.CORE.Entity;
 
-public class Users
+public class Users : ISoftDelete, IAuditable
 {
     public UserId Id { get; set; }
     public string Name { get; set; } = string.Empty;
@@ -28,6 +30,16 @@ public class Users
     // Navigation properties
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
+    public string? DeletedBy { get; set; }
+
+    // Audit
+    public DateTime CreatedAt { get; set; }
+    public string? CreatedBy { get; set; }
+    public DateTime? LastModifiedAt { get; set; }
+    public string? LastModifiedBy { get; set; }
+
     private Users() { }
 
     public Users(string name, string email, string passwordHash, Guid userId, UserRole role = UserRole.Customer)
@@ -39,6 +51,13 @@ public class Users
         Role = role;
         IsEmailVerified = false;
         AccessFailedCount = 0;
+        IsDeleted = false;
+    }
+
+    public void SoftDelete()
+    {
+        IsDeleted = true;
+        DeletedAt = DateTime.UtcNow;
     }
 
     public void VerifyEmail()

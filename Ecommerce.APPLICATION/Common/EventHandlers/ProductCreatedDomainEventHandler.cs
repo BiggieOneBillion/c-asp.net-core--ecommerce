@@ -8,45 +8,30 @@ using Ecommerce.CORE.DomainEvents;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Ecommerce.APPLICATION.Common.EventHandlers
 {
     public class ProductCreatedDomainEventHandler : INotificationHandler<ProductCreatedDomainEvent>
     {
+        private readonly Microsoft.Extensions.Logging.ILogger<ProductCreatedDomainEventHandler> _logger;
 
-        private readonly IInventoryRepository inventoryRepository;
-        private readonly IInventoryMovementRepository inventoryMovementLogRepository;
-
-        private readonly IUnitOfWork _unitOfWork;
-
-        public ProductCreatedDomainEventHandler(
-            IInventoryRepository inventoryRepository,
-            IInventoryMovementRepository inventoryMovementLogRepository,
-            IUnitOfWork unitOfWork)
+        public ProductCreatedDomainEventHandler(Microsoft.Extensions.Logging.ILogger<ProductCreatedDomainEventHandler> logger)
         {
-            this.inventoryRepository = inventoryRepository;
-            this.inventoryMovementLogRepository = inventoryMovementLogRepository;
-             _unitOfWork = unitOfWork;
+            _logger = logger;
         }
-        public async Task Handle(ProductCreatedDomainEvent notification, CancellationToken cancellationToken)
+
+        public Task Handle(ProductCreatedDomainEvent notification, CancellationToken cancellationToken)
         {
+            _logger.LogInformation(
+                "Domain Event Handled: {EventName}. Product {ProductId} created.",
+                notification.GetType().Name,
+                notification.ProductId);
 
-                var inventory = Inventory.Create(
-                ProductId.Create(notification.ProductId),
-                notification.StockQuantity);
-
-                await inventoryRepository.CreateAsync(inventory);
-
-                var inventoryMovement = InventoryMovement.Create(
-                    ProductId.Create(notification.ProductId),
-                    notification.StockQuantity,
-                    0,
-                    "Initial stock for new product");
-
-                await inventoryMovementLogRepository.CreateAsync(inventoryMovement);
-
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
+            // Inventory and InventoryMovement are now initialized synchronously in CreateProductCommandHandler.
+            // This prevents duplicate key constraint violations in the Outbox processor job.
+            
+            return Task.CompletedTask;
         }
     }
 }

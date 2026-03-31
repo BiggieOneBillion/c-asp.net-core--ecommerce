@@ -35,10 +35,8 @@ public class CategoryRepository : ICategoryRepository
 
     public async Task<Category?> GetByIdAsync(Guid id)
     {
-        // return await _context.Categories.FirstOrDefaultAsync(c => c.Id.Id == id);
-       
-        return await _context.Categories.FirstOrDefaultAsync(c => c.Id == CategoryId.Create(id)); //! QUICK FIX 
-        // TODO: REVIEW LATER AND FIX PROPERLY
+        var categoryId = CategoryId.Create(id);
+        return await _context.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
     }
 
     public async Task UpdateAsync(Category entity)

@@ -1,19 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Ecommerce.CORE.ValueObjects
+namespace Ecommerce.CORE.ValueObjects;
+
+public record InventoryMovementId(Guid Id)
 {
-    public class InventoryMovementId
-    {
-        public Guid Id { get; set; }
+    public string Value() => Id.ToString();
 
-        public string Value () => Id.ToString();
-
-        public static InventoryMovementId Create(Guid id)
-        {
-            return new InventoryMovementId { Id = id };
-        }
-    }
+    public static InventoryMovementId Create(Guid id) => new(id);
 }

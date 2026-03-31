@@ -7,29 +7,15 @@ namespace Ecommerce.APPLICATION.Validations.Product
     {
         public UpdateProductDTOValidator()
         {
-            RuleFor(x => x.ProductId)
-                .NotEqual(Guid.Empty)
-                .WithMessage("Product ID must be a valid GUID.");
-
             RuleFor(x => x.Name)
-                .NotEmpty()
-                .WithMessage("Product name is required.")
-                .MaximumLength(200)
-                .WithMessage("Product name must not exceed 200 characters.");
+                .NotEmpty().WithMessage("Product name is required.")
+                .MaximumLength(200).WithMessage("Product name must not exceed 200 characters.");
 
             RuleFor(x => x.Description)
-                .NotEmpty()
-                .WithMessage("Product description is required.")
-                .MaximumLength(1000)
-                .WithMessage("Product description must not exceed 1000 characters.");
+                .NotEmpty().WithMessage("Description is required.");
 
             RuleFor(x => x.CategoryId)
-                .NotEqual(Guid.Empty)
-                .WithMessage("Category ID must be a valid GUID.");
-
-            RuleFor(x => x.CurrentPrice)
-                .GreaterThan(0)
-                .WithMessage("Current price must be greater than 0.");
+                .NotEmpty().WithMessage("Category ID is required.");
         }
     }
 }

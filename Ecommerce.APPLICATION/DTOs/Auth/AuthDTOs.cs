@@ -27,12 +27,14 @@ public record LoginRequest(
 /// </summary>
 /// <param name="AccessToken">JWT access token for authenticating requests</param>
 /// <param name="RefreshToken">Token used to obtain a new access token</param>
+/// <param name="UserId">Unique identifier of the user</param>
 /// <param name="Name">User's full name</param>
 /// <param name="Email">User's email address</param>
 /// <param name="Role">Assigned user role (e.g., Admin, Customer)</param>
 public record AuthResponse(
     string AccessToken,
     string RefreshToken,
+    Guid UserId,
     string Name,
     string Email,
     string Role);

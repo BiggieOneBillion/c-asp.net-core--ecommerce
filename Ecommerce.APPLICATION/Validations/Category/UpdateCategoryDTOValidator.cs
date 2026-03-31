@@ -7,13 +7,13 @@ namespace Ecommerce.APPLICATION.Validations.Category
     {
         public UpdateCategoryDTOValidator()
         {
-            RuleFor(x => x.CategoryName)
+            RuleFor(x => x.Name)
                 .NotEmpty()
                 .WithMessage("Category name is required.")
                 .MaximumLength(100)
                 .WithMessage("Category name must not exceed 100 characters.");
 
-            RuleFor(x => x.CategoryDescription)
+            RuleFor(x => x.Description)
                 .NotEmpty()
                 .WithMessage("Category description is required.")
                 .MaximumLength(500)

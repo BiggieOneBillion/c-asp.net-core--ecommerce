@@ -1,6 +1,7 @@
 using System;
 using Ecommerce.CORE.Entity;
 using Ecommerce.CORE.Interfaces;
+using Ecommerce.CORE.ValueObjects;
 using Ecommerce.INFRASTRUCTURE.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,14 +35,16 @@ public class ProductRepository : IProductRepository
 
     public async Task<IEnumerable<Product>> GetByCategoryAsync(Guid categoryId)
     {
+        var catId = CategoryId.Create(categoryId);
         return await _context.Products
-            .Where(p => p.CategoryId.Id == categoryId)
+            .Where(p => p.CategoryId == catId)
             .ToListAsync();
     }
 
     public async Task<Product?> GetByIdAsync(Guid id)
     {
-        return await _context.Products.FirstOrDefaultAsync(p => p.Id.Id == id);
+        var productId = ProductId.Create(id);
+        return await _context.Products.FirstOrDefaultAsync(p => p.Id == productId);
     }
 
     public async Task<Product?> GetProductByNameAsync(string productName)
@@ -57,8 +60,9 @@ public class ProductRepository : IProductRepository
 
     public async Task<List<Product>> GetByIdsAsync(IEnumerable<Guid> ids)
     {
+        var productIds = ids.Select(ProductId.Create).ToList();
         return await _context.Products
-            .Where(p => ids.ToList().Contains(p.Id.Id))
+            .Where(p => productIds.Contains(p.Id))
             .ToListAsync();
     }
 }

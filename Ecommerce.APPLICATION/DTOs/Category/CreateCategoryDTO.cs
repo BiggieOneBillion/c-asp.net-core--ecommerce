@@ -1,5 +1,3 @@
-
-
 namespace Ecommerce.APPLICATION.DTOs.Category
 {
     /// <summary>
@@ -10,12 +8,17 @@ namespace Ecommerce.APPLICATION.DTOs.Category
         /// <summary>
         /// Name of the category
         /// </summary>
-        public string CategoryName { get; init;} = string.Empty;
+        public string Name { get; init;} = string.Empty;
 
         /// <summary>
         /// Detailed description of the category
         /// </summary>
-        public string CategoryDescription { get; init;} = string.Empty;
+        public string Description { get; init;} = string.Empty;
+
+         /// <summary>
+        /// Parent Category if any
+        /// </summary>
+        public string? ParentCategoryId { get; init;} = null;
 
         /// <summary>
         /// Status indicating if the category is active (default: true)

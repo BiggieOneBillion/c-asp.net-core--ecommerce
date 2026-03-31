@@ -2,14 +2,9 @@ using System;
 
 namespace Ecommerce.CORE.Entity;
 
-public class ProductId
+public record ProductId(Guid Id)
 {
-   public Guid Id { get; set; }
+    public string Value() => Id.ToString();
 
-     public string Value () => Id.ToString();
-
-   public static ProductId Create(Guid id)
-   {
-      return new ProductId { Id = id };
-   }
+    public static ProductId Create(Guid id) => new(id);
 }

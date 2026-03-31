@@ -7,17 +7,25 @@ namespace Ecommerce.APPLICATION.Validations.Order
     {
         public CreateOrderDTOValidator()
         {
-            RuleFor(x => x.OrderId)
-                .NotEqual(Guid.Empty)
-                .WithMessage("Order ID must be a valid GUID.");
-
             RuleFor(x => x.UserId)
-                .NotEqual(Guid.Empty)
-                .WithMessage("User ID must be a valid GUID.");
+                .NotEmpty().WithMessage("User ID is required.");
 
-            RuleFor(x => x.PaymentId)
-                .NotEqual(Guid.Empty)
-                .WithMessage("Payment ID must be a valid GUID.");
+            RuleFor(x => x.Items)
+                .NotEmpty().WithMessage("Order must contain at least one item.");
+
+            RuleForEach(x => x.Items).SetValidator(new OrderItemRequestDTOValidator());
+        }
+    }
+
+    public class OrderItemRequestDTOValidator : AbstractValidator<OrderItemRequestDTO>
+    {
+        public OrderItemRequestDTOValidator()
+        {
+            RuleFor(x => x.ProductId)
+                .NotEmpty().WithMessage("Product ID is required.");
+
+            RuleFor(x => x.Quantity)
+                .GreaterThan(0).WithMessage("Quantity must be greater than zero.");
         }
     }
 }

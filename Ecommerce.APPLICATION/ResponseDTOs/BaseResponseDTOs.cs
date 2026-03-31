@@ -31,6 +31,7 @@ public record ProductResponseDTO(
     string Description,
     Guid CategoryId,
     decimal CurrentPrice,
+    string? ImageUrl = null,
     decimal? DiscountedPrice = null,
     decimal? DiscountPercentage = null);
 

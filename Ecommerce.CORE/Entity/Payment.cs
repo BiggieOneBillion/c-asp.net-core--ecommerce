@@ -13,7 +13,7 @@ public class Payment : AggregateRoot<PaymentId>
     public OrderId OrderId { get; private set; }
 
     // Private constructor for EF Core
-    private Payment() { }
+    private Payment() { OrderId = default!; }
 
     // Factory method
     public static Payment Create(PaymentType paymentType, decimal amount, OrderId orderId)

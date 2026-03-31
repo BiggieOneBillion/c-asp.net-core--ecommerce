@@ -7,10 +7,6 @@ namespace Ecommerce.APPLICATION.Validations.Inventory
     {
         public UpdateInventoryDTOValidator()
         {
-            RuleFor(x => x.InventoryId)
-                .NotEqual(Guid.Empty)
-                .WithMessage("Inventory ID must be a valid GUID.");
-
             RuleFor(x => x.ProductId)
                 .NotEqual(Guid.Empty)
                 .WithMessage("Product ID must be a valid GUID.");

@@ -88,6 +88,20 @@ public class RefreshTokenRepository : IRefreshTokenRepository
         await Task.CompletedTask;
     }
 
+    public async Task RevokeAllUserTokensAsync(UserId userId, string revokedByIp)
+    {
+        var userTokens = await GetByUserIdAsync(userId);
+        foreach (var token in userTokens)
+        {
+            if (token.IsActive)
+            {
+                token.IsRevoked = true;
+                token.Revoked = DateTime.UtcNow;
+                token.RevokedByIp = revokedByIp;
+            }
+        }
+    }
+
     public async Task DeleteAsync(RefreshToken entity)
     {
         Delete(entity);

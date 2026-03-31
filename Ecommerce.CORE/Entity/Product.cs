@@ -10,12 +10,14 @@ public class Product : AggregateRoot<ProductId>
     public string Description { get;  set; } = string.Empty;
     public CategoryId CategoryId { get;  set; } = null!;
     public decimal CurrentPrice { get;  set; }
+
+    public string? ImageUrl { get; set; }
     
     // Private constructor for EF Core
     private Product() { }
     
     // Factory method
-    public static Product Create(string name, string description, CategoryId categoryId, decimal price)
+    public static Product Create(string name, string description, CategoryId categoryId, decimal price, string? imageUrl)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException("Product name is required");
@@ -29,7 +31,8 @@ public class Product : AggregateRoot<ProductId>
             Name = name,
             Description = description,
             CategoryId = categoryId,
-            CurrentPrice = price
+            CurrentPrice = price,
+            ImageUrl = imageUrl ?? null
         };
 
         product.RaiseDomainEvent(new ProductCreatedDomainEvent(

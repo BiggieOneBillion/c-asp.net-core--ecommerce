@@ -9,4 +9,5 @@ public interface IRefreshTokenRepository : IRepository<RefreshToken>
     Task<List<RefreshToken>> GetByUserIdAsync(UserId userId);
     Task<List<RefreshToken>> GetByFamilyIdAsync(string familyId);
     Task RevokeFamilyAsync(string familyId, string revokedByIp);
+    Task RevokeAllUserTokensAsync(UserId userId, string revokedByIp);
 }

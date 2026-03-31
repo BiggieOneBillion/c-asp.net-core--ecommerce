@@ -1,20 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace Ecommerce.APPLICATION.DTOs.Product
 {
     public record UpdateProductDTO
     {
-           public Guid ProductId { get; init; }
-           
-           public string Name { get; init; } = string.Empty;
-
-           public string Description { get; init; } = string.Empty;
-
-           public Guid CategoryId { get; init; }
-
-           public decimal CurrentPrice { get; init; }
+        public string Name { get; init; } = string.Empty;
+        public string Description { get; init; } = string.Empty;
+      
+        public Guid CategoryId { get; init; }
+        public string? ImageUrl { get; init; }
+        public bool IsActive { get; init; }
     }
 }

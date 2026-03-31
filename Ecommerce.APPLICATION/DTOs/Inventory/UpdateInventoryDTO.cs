@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace Ecommerce.APPLICATION.DTOs.Inventory
 {
     /// <summary>
@@ -14,11 +9,6 @@ namespace Ecommerce.APPLICATION.DTOs.Inventory
         /// Unique identifier of the product
         /// </summary>
         public Guid ProductId { get; init; }
-        
-        /// <summary>
-        /// Unique identifier of the inventory record
-        /// </summary>
-        public Guid InventoryId { get; init; }
 
         /// <summary>
         /// Updated total stock quantity

@@ -16,7 +16,7 @@ namespace Ecommerce.APPLICATION.Validations.Users
             RuleFor(x => x.Email)
                 .NotEmpty()
                 .WithMessage("Email is required.")
-                .EmailAddress()
+                .Matches(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")
                 .WithMessage("Email must be a valid email address.")
                 .MaximumLength(255)
                 .WithMessage("Email must not exceed 255 characters.");

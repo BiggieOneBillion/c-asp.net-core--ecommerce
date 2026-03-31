@@ -40,8 +40,8 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 
         if (failures.Any())
         {
-            var errorMessage = string.Join("; ", failures.Select(f => f.ErrorMessage));
-            var error = new Error("Validation.Failed", errorMessage);
+            var firstError = failures[0].ErrorMessage;
+            var error = new Error("Validation.Failed", firstError);
 
             // Handle both Result and Result<T> types
             var resultType = typeof(TResponse);

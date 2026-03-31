@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace Ecommerce.APPLICATION.DTOs.ProductPriceHistory
 {
     /// <summary>
@@ -10,11 +5,6 @@ namespace Ecommerce.APPLICATION.DTOs.ProductPriceHistory
     /// </summary>
     public record UpdateProductPriceHistoryDTO
     {
-        /// <summary>
-        /// Unique identifier for the price history record
-        /// </summary>
-        public Guid ProductPriceHistoryId { get; init; }
-        
         /// <summary>
         /// Unique identifier of the product
         /// </summary>

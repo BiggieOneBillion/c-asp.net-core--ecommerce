@@ -7,10 +7,6 @@ namespace Ecommerce.APPLICATION.Validations.ProductPriceHistory
     {
         public UpdateProductPriceHistoryDTOValidator()
         {
-            RuleFor(x => x.ProductPriceHistoryId)
-                .NotEqual(Guid.Empty)
-                .WithMessage("Product Price History ID must be a valid GUID.");
-
             RuleFor(x => x.ProductId)
                 .NotEqual(Guid.Empty)
                 .WithMessage("Product ID must be a valid GUID.");

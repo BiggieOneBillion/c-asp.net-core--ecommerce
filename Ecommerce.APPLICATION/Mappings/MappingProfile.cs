@@ -15,7 +15,8 @@ public class MappingProfile : Profile
         // Product Mappings
         CreateMap<Product, ProductResponseDTO>()
             .ForCtorParam("ProductId", opt => opt.MapFrom(src => src.Id.Id))
-            .ForCtorParam("CategoryId", opt => opt.MapFrom(src => src.CategoryId.Id));
+            .ForCtorParam("CategoryId", opt => opt.MapFrom(src => src.CategoryId.Id))
+            .ForCtorParam("ImageUrl", opt => opt.MapFrom(src => src.ImageUrl));
 
         // User Mappings
         CreateMap<Users, UserResponseDTO>()
